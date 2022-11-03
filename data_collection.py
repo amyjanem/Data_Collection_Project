@@ -32,14 +32,8 @@ class Webscraper:
             This driver is already in the MyProtein webpage
         '''       
 
-        time.sleep(2) 
-
-        #delay  = 10
-        #self.WebDriverWait(driver, delay).until(EC.presence_of_element_located(By.XPATH, value = '//button[@class="cookie_modal_button"]'))
-
-        self.click_element(xpath)
-
-        #self.click_element(xpath) # TODO: ensure code still runs if pop-up doesn't appear
+        time.sleep(1) 
+        self.click_element(xpath)        # TODO: ensure code still runs if pop-up doesn't appear - insert a try and except clause. Try click_element(xpath), except pass
 
     
     def accept_cookies(self, xpath: str = '//button[@class="cookie_modal_button"]'):
@@ -52,39 +46,85 @@ class Webscraper:
             The xpath of the "Accept Cookies" button
         '''
 
-        time.sleep(2) 
-
-        self.click_element(xpath)   # TODO: ensure code still runs if pop-up doesn't appear
+        time.sleep(1) 
+        self.click_element(xpath)   # TODO: ensure code still runs if pop-up doesn't appear, use try/except clause
         
 
-    def find_element_in_container(self, xpath_container: str, tag_elements: str) -> list:
+    # def find_element_in_container(self, xpath_container: str, tag_elements: str) -> list:
+    #     '''
+    #     Finds elements within a specifed container and them in a list
+
+    #     Parameters
+    #     ----------
+    #     xpath_container: str
+    #         The xpath of the container
+        
+    #     tag_elements: str
+    #         The tag for the elements within the container
+    #     '''
+        
+    #     container = self.driver.find_element(By.XPATH, xpath_container)
+    #     elements_in_container = container.find_elements(By.XPATH, f'./{tag_elements}')
+
+    #    return elements_in_container
+
+    def nutrition_button_click(self, xpath: str = '//a[@class="responsiveFlyoutMenu_levelOneLink responsiveFlyoutMenu_levelOneLink-hasChildren"]'):
         '''
-        Finds elements within a specifed container and them in a list
+        Finds 'Nutrition' catergory and clicks it.
 
-        Parameters
-        ----------
-        xpath_container: str
-            The xpath of the container
-        
-        tag_elements: str
-            The tag for the elements within the container
+        Parameters:
+        -----------
+        xpath: str
+            The xpath of the nutrition button
+
         '''
         
-        container = self.driver.find_element(By.XPATH, xpath_container)
-        elements_in_container = container.find_elements(By.XPATH, f'/{tag_elements}')
-
-        return elements_in_container
+        time.sleep(1)
+        nutrition_button = self.click_element(xpath)
         
-    def find_pages_links(self, xpath_container: str, tag_elements: str) -> list:
-        page_link_list = []
-        self.find_element_in_container('//ul[@class="responsiveFlyoutMenu_levelOne "]', 'li')
 
-        for page in page
+    def open_all_nutrition_products(self, xpath: str = '//a[@class="sectionPeek_allCta sectionPeek_allCta-show"]'):
+        '''
+        Clicks 'View All' button so that all Bestseller products are showing.
+
+        Parameters:
+        -----------
+        xpath: str
+            Xpath of the 'View All' button on the NUtrition webpage
+        '''
+        
+        time.sleep(1)
+        driver.execute_script("window.scrollTo(0, 1300)")
+        time.sleep(1)
+        nutrition_view_all = self.click_element(xpath)
+        #document.body.scrollHeight
+
+    # def find_pages_links(self) -> list:
+    #     page_link_list = []
+
+    #     menu_container = driver.find_element(By.XPATH, '//ul[@class="responsiveFlyoutMenu_levelOne "]') #menu container
+    #     menu_button_list = menu_container.find_elements('./li[@class="responsiveFlyoutMenu_levelOneItem-slide"]') # finding each button in menu, ie. Nutrition, CLothing & Accessories, Vitamins etc
+
+
+    #     for option in menu_button_list: #finds each a tag within menu list, and find the associated href (URL) and stores in a list
+    #         a_tag = option.find_element(By.TAGNAME, 'a')
+    #         menu_option_link = a_tag.get_attribute('href')
+    #         page_link_list.append(menu_option_link)
+
+    #     print(page_link_list) # to check this is working and printing list of hrefs?
+
+    #     return page_link_list
+                       
+
 
 driver = webdriver.Chrome() 
 URL = "https://www.myprotein.com/"
 driver.get(URL)
+driver.maximize_window()
 
 scrape = Webscraper()
 scrape.close_email_signup()
 scrape.accept_cookies()
+scrape.nutrition_button_click()
+scrape.open_all_nutrition_products()
+#scrape.find_pages_links()
