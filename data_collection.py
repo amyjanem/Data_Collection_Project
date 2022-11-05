@@ -42,6 +42,18 @@ class Webscraper:
         return elements_in_container
 
 
+    def scroll_website(self, scroll_height: int):
+        '''
+        Scrolls to a specified point on the website. #is this a static method, along with click and find element? **
+
+        Parameters:
+        ----------
+        scroll_height: int
+            The desired height to scroll the webpage to.
+        '''
+        driver.execute_script(f"window.scrollTo(0, {scroll_height})")
+
+
     def close_email_signup(self, xpath: str = '//button[@class="emailReengagement_close_button"]'):
         '''
         Open MyProtein and close email newletter sign up pop-up
@@ -51,7 +63,6 @@ class Webscraper:
         driver: webdriver.Chrome
             This driver is already in the MyProtein webpage
         '''       
-
         time.sleep(1) 
         self.click_element(xpath)        # TODO: ensure code still runs if pop-up doesn't appear - insert a try and except clause. Try click_element(xpath), except pass
 
@@ -65,7 +76,6 @@ class Webscraper:
         xpath: str
             The xpath of the "Accept Cookies" button
         '''
-
         time.sleep(1) 
         self.click_element(xpath)   # TODO: ensure code still runs if pop-up doesn't appear, use try/except clause
         
@@ -79,8 +89,7 @@ class Webscraper:
         xpath: str
             The xpath of the nutrition button
 
-        '''
-        
+        '''   
         time.sleep(1)
         nutrition_button = self.click_element(xpath)
         
@@ -139,3 +148,46 @@ if __name__ == "__main__":
     scrape.nutrition_button_click()
     scrape.open_all_nutrition_products()
     scrape.find_product_links()
+
+
+def get_product_image(self):
+    '''
+    Finds the href to the product image and returns it??
+
+    '''
+    time.sleep(1)
+    product_image = driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
+    print(product_image.text)
+
+
+def get_product_name(self):
+    '''
+    Finds xpath of product name and returns it?
+    '''
+    time.sleep(1)
+    product_name = driver. find_element(By.XPATH, '//h1[@class="productName_title"]')
+    print(product_name.text)
+
+
+def get_product_price(self):
+    '''
+    Finds price of product and returns it?
+    '''
+    time.sleep(1)
+    product_price = driver. find_element(By.XPATH, '//p[@class="productPrice_price  "]')
+    print(product_price.text)
+    
+def get_product_rating(self):
+    '''
+    Finds rating of product and returns it?
+    '''
+    time.sleep(1)
+    product_rating = driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]')
+    print(product_rating.text)
+
+
+
+get_product_image()
+get_product_name()
+get_product_price()
+get_product_rating()
