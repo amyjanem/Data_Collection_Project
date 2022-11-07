@@ -147,7 +147,8 @@ if __name__ == "__main__":
     scrape.accept_cookies()
     scrape.nutrition_button_click()
     scrape.open_all_nutrition_products()
-    scrape.find_product_links()
+    links = scrape.find_product_links()
+    print(links)
 
 
 def get_product_image(self):
@@ -187,7 +188,7 @@ def get_product_rating(self):
 
 
 
-get_product_image()
-get_product_name()
-get_product_price()
-get_product_rating()
+#get_product_image()
+#get_product_name()
+#get_product_price()
+#get_product_rating()
