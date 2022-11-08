@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from datetime import datetime
 import time
 
 
@@ -134,7 +135,71 @@ class Webscraper:
             product_link_list.append(product_link)
 
         return product_link_list
-                       
+
+    def first_product_click(self):
+        first_product = scrape.click_element('//a[@class="athenaProductBlock_linkImage"]')
+
+
+
+
+
+# TODO: Your dictionary should include all details for each record, its unique ID, timestamp of when it was scraped and links to any images associated with each record.
+
+def get_product_data():
+    '''
+    Finds xpath of product name, price, and rating.
+    '''
+    product_dict = {}
+
+    time.sleep(1)
+    product_name = driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text
+    product_dict["Product Name"] = product_name
+
+    time.sleep(1)
+    product_price = driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
+    product_dict["Product Price"] = product_price
+
+    time.sleep(1)
+    product_rating = driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
+    product_dict["Product Rating"] = product_rating
+
+    print(product_dict)
+
+
+
+def get_product_image():
+    '''
+    Finds the href to the product image and returns it??
+
+    '''
+    time.sleep(1)
+    product_image = driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
+
+    return product_image
+
+
+#@staticmethod
+def get_timestamp():
+    '''
+    Prints the timestamp of current time.
+    '''
+    now = datetime.now()
+
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+
+
+def create_dict():
+    
+    link_list = driver.find_product_links()
+    product_dataset = get_product_data()
+    #print(product_dataset)
+
+
+
+
+
+
 
 if __name__ == "__main__":
     driver = webdriver.Chrome() 
@@ -147,48 +212,17 @@ if __name__ == "__main__":
     scrape.accept_cookies()
     scrape.nutrition_button_click()
     scrape.open_all_nutrition_products()
-    links = scrape.find_product_links()
-    print(links)
+    #links = scrape.find_product_links()
+    #print(links)
 
-
-def get_product_image(self):
-    '''
-    Finds the href to the product image and returns it??
-
-    '''
-    time.sleep(1)
-    product_image = driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
-    print(product_image.text)
-
-
-def get_product_name(self):
-    '''
-    Finds xpath of product name and returns it?
-    '''
-    time.sleep(1)
-    product_name = driver. find_element(By.XPATH, '//h1[@class="productName_title"]')
-    print(product_name.text)
-
-
-def get_product_price(self):
-    '''
-    Finds price of product and returns it?
-    '''
-    time.sleep(1)
-    product_price = driver. find_element(By.XPATH, '//p[@class="productPrice_price  "]')
-    print(product_price.text)
-    
-def get_product_rating(self):
-    '''
-    Finds rating of product and returns it?
-    '''
-    time.sleep(1)
-    product_rating = driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]')
-    print(product_rating.text)
+    scrape.first_product_click()
 
 
 
-#get_product_image()
-#get_product_name()
-#get_product_price()
-#get_product_rating()
+get_product_data()
+#create_dict()
+get_timestamp()
+
+    # for link in product_link_list:
+    #    product_dict = {"Product Name" : product_name, "Product Price" : product_price, "Product Rating" : product_rating, "Product Image Link" : product_image, "Time of Data Retrieval" : time_stamp}
+
