@@ -175,30 +175,12 @@ class MyProteinScraper(Webscraper):
         now = datetime.now()
 
         current_time = now.strftime("%H:%M:%S")
-        print("Current Time =", current_time)
+        #print(current_time)
+
+        return current_time
 
 
-    # def get_product_data(self):
-    #     '''
-    #     Finds xpath of product name, price, and rating of product.
-    #     '''
-    #     product_dict = {}
-
-    #     product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text
-    #     product_dict["Product Name"] = product_name
-
-    #     product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
-    #     product_dict["Product Price"] = product_price
-
-    #     product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
-    #     product_dict["Product Rating"] = product_rating
-
-    #     print(product_dict)
-
-    #     return product_dict
-
-
-    def create_product_dict(self, product_link):
+    def get_product_data(self, product_link):
         '''
         Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
 
@@ -214,14 +196,35 @@ class MyProteinScraper(Webscraper):
         product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
         product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
         product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
+        #product_time_stamp = self.get_timestamp()
 
         product_dict.update({
             "Product Name" : product_name,
             "Price" : product_price,
-            "Rating" : product_rating
+            "Rating" : product_rating,
+            "Time Scraped" : self.get_timestamp()
             })
 
         return product_dict
+
+
+    def scrape_pages(self, product_link_list):
+
+        product_data_list= []
+        product_dict = {}
+
+        for link in product_link_list:
+            
+            self.driver.get(link)
+            product_data = self.get_product_data()
+            product_dict.append(product_data)
+            product_image = self.get_product_image()
+            product_data_list.append(product_image)
+            timestamp = self.get_timestamp()
+            product_data_list.append(timestamp)
+
+        return product_data_list
+
 
 
 
@@ -236,7 +239,7 @@ if __name__ == "__main__":
     #print(links)
 
     scrape.first_product_click()
-#get_product_data()
+
 
 
 
