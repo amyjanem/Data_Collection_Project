@@ -178,7 +178,6 @@ class MyProteinScraper(Webscraper):
         print("Current Time =", current_time)
 
 
-
     # def get_product_data(self):
     #     '''
     #     Finds xpath of product name, price, and rating of product.
@@ -197,7 +196,6 @@ class MyProteinScraper(Webscraper):
     #     print(product_dict)
 
     #     return product_dict
-
 
 
     def create_product_dict(self, product_link):
@@ -224,7 +222,6 @@ class MyProteinScraper(Webscraper):
             })
 
         return product_dict
-
 
 
 
