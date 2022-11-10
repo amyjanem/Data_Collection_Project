@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 import time
-
+import uuid
 
 class Webscraper:
 
@@ -180,7 +180,7 @@ class MyProteinScraper(Webscraper):
         return current_time
 
 
-    def get_product_data(self, product_link):
+    def get_product_data(self, product_link) -> dict:
         '''
         Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
 
@@ -196,9 +196,10 @@ class MyProteinScraper(Webscraper):
         product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
         product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
         product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
-        #product_time_stamp = self.get_timestamp()
+        
 
         product_dict.update({
+            "Product ID" : str(uuid.uuid4()),
             "Product Name" : product_name,
             "Price" : product_price,
             "Rating" : product_rating,
@@ -208,22 +209,27 @@ class MyProteinScraper(Webscraper):
         return product_dict
 
 
-    def scrape_pages(self, product_link_list):
+    def scrape_pages(self, product_link_list) -> list:
 
-        product_data_list= []
-        product_dict = {}
+        product_data_list_all= []
+        product_dict_all = {}
 
         for link in product_link_list:
             
             self.driver.get(link)
-            product_data = self.get_product_data()
-            product_dict.append(product_data)
-            product_image = self.get_product_image()
-            product_data_list.append(product_image)
-            timestamp = self.get_timestamp()
-            product_data_list.append(timestamp)
 
-        return product_data_list
+            product_data = self.get_product_data(link)
+            product_dict_individual = product_dict_all.update(product_data)
+
+            product_image = self.get_product_image()
+            product_dict_individual = product_dict_all.update(product_image)
+
+            timestamp = self.get_timestamp()
+            product_dict_individual = product_dict_all.update(timestamp)
+
+            product_data_list_all.append(product_dict_individual)
+
+        return product_data_list_all
 
 
 
