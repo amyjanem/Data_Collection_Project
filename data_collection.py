@@ -2,11 +2,19 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from datetime import datetime
 import time
 
 
 class Webscraper:
 
+
+    def __init__(self, url: str = "https://www.myprotein.com/"):
+        self.driver = webdriver.Chrome()
+        self.driver.get(url)
+        self.driver.maximize_window()
+    
+    
     def click_element(self, xpath: str):
         '''
         Finds a specific element on the webpage and clicks it
@@ -18,7 +26,7 @@ class Webscraper:
         '''
         time.sleep(2)
 
-        element = driver.find_element(By.XPATH, xpath)
+        element = self.driver.find_element(By.XPATH, xpath)
         element.click()
 
 
@@ -34,8 +42,7 @@ class Webscraper:
         tag_elements: str
             The tag for the elements within the container
         '''
-        
-        container = driver.find_element(By.XPATH, xpath_container)
+        container = self.driver.find_element(By.XPATH, xpath_container)
         elements_in_container = container.find_elements(By.XPATH, f'./{tag_elements}')
         print(elements_in_container)
 
@@ -51,7 +58,7 @@ class Webscraper:
         scroll_height: int
             The desired height to scroll the webpage to.
         '''
-        driver.execute_script(f"window.scrollTo(0, {scroll_height})")
+        self.driver.execute_script(f"window.scrollTo(0, {scroll_height})")
 
 
     def close_email_signup(self, xpath: str = '//button[@class="emailReengagement_close_button"]'):
@@ -63,10 +70,13 @@ class Webscraper:
         driver: webdriver.Chrome
             This driver is already in the MyProtein webpage
         '''       
-        time.sleep(1) 
-        self.click_element(xpath)        # TODO: ensure code still runs if pop-up doesn't appear - insert a try and except clause. Try click_element(xpath), except pass
-
+        try:
+            time.sleep(1) 
+            self.click_element(xpath)
+        except:
+            pass
     
+
     def accept_cookies(self, xpath: str = '//button[@class="cookie_modal_button"]'):
         '''
         Accepts the cookies on the webpage
@@ -76,9 +86,16 @@ class Webscraper:
         xpath: str
             The xpath of the "Accept Cookies" button
         '''
-        time.sleep(1) 
-        self.click_element(xpath)   # TODO: ensure code still runs if pop-up doesn't appear, use try/except clause
-        
+        try:
+            time.sleep(1)
+            self.click_element(xpath)
+        except:
+            pass
+
+
+
+class MyProteinScraper(Webscraper):    
+
 
     def nutrition_button_click(self, xpath: str = '//a[@class="responsiveFlyoutMenu_levelOneLink responsiveFlyoutMenu_levelOneLink-hasChildren"]'):
         '''
@@ -105,7 +122,7 @@ class Webscraper:
         '''
         
         time.sleep(1)
-        driver.execute_script("window.scrollTo(0, 1300)")
+        self.driver.execute_script("window.scrollTo(0, 1300)")
         time.sleep(1)
         nutrition_view_all = self.click_element(xpath)
         
@@ -114,13 +131,6 @@ class Webscraper:
         '''
         Gets links to all products and stores the links to these in a list (product_link_list)
 
-        Parameters:
-        ----------
-        xpath: str
-            Xpath to each product
-        
-        xpath_container: str
-            Xpath to the container of all products
         '''
         product_link_list = []
 
@@ -129,65 +139,109 @@ class Webscraper:
 
         for product in products: #finds each 'a' tag within list, finds the associated href (URL) and stores in a list
             product_link = product.find_element(By.XPATH, './/a').get_attribute('href')
-            #a_tag = product.find_element(By.TAG_NAME('a'))
-            #product_link = a_tag.get_attribute('href')
             product_link_list.append(product_link)
 
         return product_link_list
-                       
+
+
+    def first_product_click(self):
+        '''
+        Clicks on the first product on the page. (for testing purposes for now!)
+        '''
+        time.sleep(1)
+        first_product = self.click_element('//a[@class="athenaProductBlock_linkImage"]')
+        time.sleep(1)
+
+
+
+# TODO: Your dictionary should include all details for each record, its unique ID, timestamp of when it was scraped and links to any images associated with each record.
+
+    def get_product_image(self):
+        '''
+        Finds the href to the product image?
+
+        '''
+        time.sleep(1)
+        product_image = self.driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
+
+        return product_image
+
+
+    @staticmethod
+    def get_timestamp():
+        '''
+        Prints the timestamp of current time.
+        '''
+        now = datetime.now()
+
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+
+
+    # def get_product_data(self):
+    #     '''
+    #     Finds xpath of product name, price, and rating of product.
+    #     '''
+    #     product_dict = {}
+
+    #     product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text
+    #     product_dict["Product Name"] = product_name
+
+    #     product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
+    #     product_dict["Product Price"] = product_price
+
+    #     product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
+    #     product_dict["Product Rating"] = product_rating
+
+    #     print(product_dict)
+
+    #     return product_dict
+
+
+    def create_product_dict(self, product_link):
+        '''
+        Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
+
+        Parameters:
+        -----------
+        product_link: str
+            the xpath of the url link to an individual product
+        '''
+        self.driver.get(product_link)
+        
+        product_dict = {}
+       
+        product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
+        product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
+        product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
+
+        product_dict.update({
+            "Product Name" : product_name,
+            "Price" : product_price,
+            "Rating" : product_rating
+            })
+
+        return product_dict
+
+
 
 if __name__ == "__main__":
-    driver = webdriver.Chrome() 
-    URL = "https://www.myprotein.com/"
-    driver.get(URL)
-    driver.maximize_window()
 
-    scrape = Webscraper()
+    scrape = MyProteinScraper()
     scrape.close_email_signup()
     scrape.accept_cookies()
     scrape.nutrition_button_click()
     scrape.open_all_nutrition_products()
-    scrape.find_product_links()
+    #links = scrape.find_product_links()
+    #print(links)
+
+    scrape.first_product_click()
+#get_product_data()
 
 
-def get_product_image(self):
-    '''
-    Finds the href to the product image and returns it??
+#create_dict()
+#get_timestamp()
 
-    '''
-    time.sleep(1)
-    product_image = driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
-    print(product_image.text)
+    # for link in product_link_list:
+    #    product_dict = {"Product Name" : product_name, "Product Price" : product_price, "Product Rating" : product_rating, "Product Image Link" : product_image, "Time of Data Retrieval" : time_stamp}
 
-
-def get_product_name(self):
-    '''
-    Finds xpath of product name and returns it?
-    '''
-    time.sleep(1)
-    product_name = driver. find_element(By.XPATH, '//h1[@class="productName_title"]')
-    print(product_name.text)
-
-
-def get_product_price(self):
-    '''
-    Finds price of product and returns it?
-    '''
-    time.sleep(1)
-    product_price = driver. find_element(By.XPATH, '//p[@class="productPrice_price  "]')
-    print(product_price.text)
-    
-def get_product_rating(self):
-    '''
-    Finds rating of product and returns it?
-    '''
-    time.sleep(1)
-    product_rating = driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]')
-    print(product_rating.text)
-
-
-
-get_product_image()
-get_product_name()
-get_product_price()
-get_product_rating()
