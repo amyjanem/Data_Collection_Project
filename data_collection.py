@@ -239,9 +239,4 @@ if __name__ == "__main__":
 #get_product_data()
 
 
-#create_dict()
-#get_timestamp()
-
-    # for link in product_link_list:
-    #    product_dict = {"Product Name" : product_name, "Product Price" : product_price, "Product Rating" : product_rating, "Product Image Link" : product_image, "Time of Data Retrieval" : time_stamp}
 
