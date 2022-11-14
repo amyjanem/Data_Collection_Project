@@ -44,7 +44,7 @@ class Webscraper:
         '''
         container = self.driver.find_element(By.XPATH, xpath_container)
         elements_in_container = container.find_elements(By.XPATH, f'./{tag_elements}')
-        print(elements_in_container)
+        #print(elements_in_container)
 
         return elements_in_container
 
@@ -130,7 +130,6 @@ class MyProteinScraper(Webscraper):
     def find_product_links(self) -> list:
         '''
         Gets links to all products and stores the links to these in a list (product_link_list)
-
         '''
         product_link_list = []
 
@@ -138,10 +137,15 @@ class MyProteinScraper(Webscraper):
         time.sleep(1)
 
         for product in products: #finds each 'a' tag within list, finds the associated href (URL) and stores in a list
-            product_link = product.find_element(By.XPATH, './/a').get_attribute('href')
-            product_link_list.append(product_link)
+            try:
+                product_link = product.find_element(By.XPATH, './/div/div/a[@class="athenaProductBlock_linkImage"]').get_attribute('href')
+                product_link_list.append(product_link)
+            except:
+                pass
 
+        #print(len(product_link_list))
         return product_link_list
+
 
 
     def first_product_click(self):
@@ -180,7 +184,7 @@ class MyProteinScraper(Webscraper):
         return current_time
 
 
-    def get_product_data(self, product_link) -> dict:
+    def get_product_data(self) -> dict:
         '''
         Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
 
@@ -189,7 +193,7 @@ class MyProteinScraper(Webscraper):
         product_link: str
             the xpath of the url link to an individual product
         '''
-        self.driver.get(product_link)
+        #self.driver.get(product_link)
         
         product_dict = {}
        
@@ -209,29 +213,48 @@ class MyProteinScraper(Webscraper):
         return product_dict
 
 
+
+    # def scrape_pages(self, product_link_list) -> list:
+
+    #     product_data_list_all= []
+    #     product_dict_all = {}
+
+    #     for link in product_link_list:
+            
+    #         product_data = self.get_product_data(link)
+    #         product_dict_individual = product_dict_all.update(product_data)
+
+    #         product_image = self.get_product_image()
+    #         product_dict_individual = product_dict_all.update(product_image)
+
+    #         timestamp = self.get_timestamp()
+    #         product_dict_individual = product_dict_all.update(timestamp)
+
+    #         product_data_list_all.append(product_dict_individual)
+
+    #     return product_data_list_all
+
+
     def scrape_pages(self, product_link_list) -> list:
 
-        product_data_list_all= []
-        product_dict_all = {}
-
-        for link in product_link_list:
+        product_data_list_all= []   #list of product dictionaries
+        product_image_list = [] #list of product image links
+        
+        for link in range(0, 2): #testing only 3 links for now - to be changed to scrape whole page
             
-            self.driver.get(link)
+            product_link = product_link_list[link]
+            self.driver.get(product_link)
+            time.sleep(1)
 
-            product_data = self.get_product_data(link)
-            product_dict_individual = product_dict_all.update(product_data)
+            product_data = self.get_product_data()
+            #product_dict_individual = product_dict_all.update(product_data)
+            product_data_list_all.append(product_data)
 
             product_image = self.get_product_image()
-            product_dict_individual = product_dict_all.update(product_image)
+            product_image_list.update(product_image)
 
-            timestamp = self.get_timestamp()
-            product_dict_individual = product_dict_all.update(timestamp)
-
-            product_data_list_all.append(product_dict_individual)
-
-        return product_data_list_all
-
-
+            
+        return product_data_list_all, product_image_list #?
 
 
 if __name__ == "__main__":
@@ -242,9 +265,10 @@ if __name__ == "__main__":
     scrape.nutrition_button_click()
     scrape.open_all_nutrition_products()
     #links = scrape.find_product_links()
+
     #print(links)
 
-    scrape.first_product_click()
+    #scrape.first_product_click()
 
 
 
