@@ -147,7 +147,6 @@ class MyProteinScraper(Webscraper):
         return product_link_list
 
 
-
     def first_product_click(self):
         '''
         Clicks on the first product on the page. (for testing purposes for now!)
@@ -207,7 +206,8 @@ class MyProteinScraper(Webscraper):
             "Product Name" : product_name,
             "Price" : product_price,
             "Rating" : product_rating,
-            "Time Scraped" : self.get_timestamp()
+            "Time Scraped" : self.get_timestamp(),
+            "Image Link" : self.get_product_image()            
             })
 
         return product_dict
@@ -238,23 +238,20 @@ class MyProteinScraper(Webscraper):
     def scrape_pages(self, product_link_list) -> list:
 
         product_data_list_all= []   #list of product dictionaries
-        product_image_list = [] #list of product image links
+        #product_image_list = [] #list of product image links
         
         for link in range(0, 2): #testing only 3 links for now - to be changed to scrape whole page
             
             product_link = product_link_list[link]
             self.driver.get(product_link)
+
             time.sleep(1)
 
             product_data = self.get_product_data()
-            #product_dict_individual = product_dict_all.update(product_data)
             product_data_list_all.append(product_data)
+                        
+        return product_data_list_all#, product_image_list ?
 
-            product_image = self.get_product_image()
-            product_image_list.update(product_image)
-
-            
-        return product_data_list_all, product_image_list #?
 
 
 if __name__ == "__main__":
