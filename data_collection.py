@@ -197,8 +197,14 @@ class MyProteinScraper(Webscraper):
         product_dict = {}
        
         product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
+        
         product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
-        product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
+
+        try:
+            product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
+        except:
+            product_rating = 'None'
+            pass
         
 
         product_dict.update({
@@ -213,34 +219,12 @@ class MyProteinScraper(Webscraper):
         return product_dict
 
 
-
-    # def scrape_pages(self, product_link_list) -> list:
-
-    #     product_data_list_all= []
-    #     product_dict_all = {}
-
-    #     for link in product_link_list:
-            
-    #         product_data = self.get_product_data(link)
-    #         product_dict_individual = product_dict_all.update(product_data)
-
-    #         product_image = self.get_product_image()
-    #         product_dict_individual = product_dict_all.update(product_image)
-
-    #         timestamp = self.get_timestamp()
-    #         product_dict_individual = product_dict_all.update(timestamp)
-
-    #         product_data_list_all.append(product_dict_individual)
-
-    #     return product_data_list_all
-
-
     def scrape_pages(self, product_link_list) -> list:
 
         product_data_list_all= []   #list of product dictionaries
         #product_image_list = [] #list of product image links
         
-        for link in range(0, 2): #testing only 3 links for now - to be changed to scrape whole page
+        for link in range(len(product_link_list)): 
             
             product_link = product_link_list[link]
             self.driver.get(product_link)
