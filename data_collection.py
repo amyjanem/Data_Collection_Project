@@ -255,15 +255,15 @@ class MyProteinScraper(Webscraper):
         '''
         Creates a folder called 'raw_data' if it doesn't already exist, and then creates a folder within that, with the unique product ID as the filename.
 
-        Parametere:
+        Parameters:
         -----------
         filename:
             The unique product ID of each product.
         '''
         if not os.path.exists('raw_data'):
             os.makedirs('raw_data')
-        else:
-            print('raw_data directory already exists')
+        # else:
+        #     print('raw_data directory already exists')
             
         if not os.path.exists(f'raw_data/{filename}'):
             os.makedirs(f'raw_data/{filename}')
@@ -285,6 +285,32 @@ class MyProteinScraper(Webscraper):
             json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
 
 
+    def create_folder_images(self):
+        
+        if not os.path.exists('images'):
+            os.makedirs('images')
+
+        
+
+
+
+    def scrape_image_links(self):
+
+
+
+
+# if __name__ == "__main__":
+    
+#     scrape = MyProteinScraper()
+#     scrape.close_email_signup()
+#     scrape.accept_cookies()
+#     scrape.nutrition_button_click()
+#     scrape.open_all_nutrition_products()
+#     #links = scrape.find_product_links()
+
+#     #print(links)
+
+#     #scrape.first_product_click()
 
 if __name__ == "__main__":
 
@@ -298,7 +324,5 @@ if __name__ == "__main__":
     #print(links)
 
     #scrape.first_product_click()
-
-
 
 
