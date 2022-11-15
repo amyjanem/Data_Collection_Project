@@ -5,6 +5,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 import time
 import uuid
+import os
+import json
 
 class Webscraper:
 
@@ -161,7 +163,7 @@ class MyProteinScraper(Webscraper):
 
     def get_product_image(self):
         '''
-        Finds the href to the product image?
+        Finds the href to the product image.
 
         '''
         time.sleep(1)
@@ -178,7 +180,6 @@ class MyProteinScraper(Webscraper):
         now = datetime.now()
 
         current_time = now.strftime("%H:%M:%S")
-        #print(current_time)
 
         return current_time
 
@@ -191,9 +192,7 @@ class MyProteinScraper(Webscraper):
         -----------
         product_link: str
             the xpath of the url link to an individual product
-        '''
-        #self.driver.get(product_link)
-        
+        '''       
         product_dict = {}
        
         product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
@@ -220,11 +219,20 @@ class MyProteinScraper(Webscraper):
 
 
     def scrape_pages(self, product_link_list) -> list:
+        '''
+        Iterates through URL links on webpage and scrape data from each, and stores the data in a list.
+
+        Parameters:
+        ----------
+        product_link_list:
+            list of URL's ("href" tags) for each product shown on the webpage.
+        '''
 
         product_data_list_all= []   #list of product dictionaries
-        #product_image_list = [] #list of product image links
+        
         
         for link in range(len(product_link_list)): 
+        #for link in range(0,2):                        #for testing
             
             product_link = product_link_list[link]
             self.driver.get(product_link)
@@ -232,9 +240,49 @@ class MyProteinScraper(Webscraper):
             time.sleep(1)
 
             product_data = self.get_product_data()
+                 
+            filename = list(product_data.values())[0]   #indexes the product ID value and uses it for folder name     
+            self.create_product_folder(filename)
+
+            self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
+
             product_data_list_all.append(product_data)
                         
-        return product_data_list_all#, product_image_list ?
+        return product_data_list_all
+
+
+    def create_product_folder(self, filename):
+        '''
+        Creates a folder called 'raw_data' if it doesn't already exist, and then creates a folder within that, with the unique product ID as the filename.
+
+        Parametere:
+        -----------
+        filename:
+            The unique product ID of each product.
+        '''
+        if not os.path.exists('raw_data'):
+            os.makedirs('raw_data')
+        else:
+            print('raw_data directory already exists')
+            
+        if not os.path.exists(f'raw_data/{filename}'):
+            os.makedirs(f'raw_data/{filename}')
+
+
+    def write_json(self,data,filename):
+        '''
+        Writes the dictionary data to a json file and saves it within it's own product folder.
+
+        Parameters:
+        -----------
+        data:
+            the product dictionary to be saved into the json format
+        
+        filename:
+            the unique product ID to be used as a folder name.
+        '''
+        with open(f'raw_data/{filename}/data.json', 'w') as file:
+            json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
 
 
 
