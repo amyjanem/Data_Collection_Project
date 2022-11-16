@@ -194,7 +194,7 @@ class MyProteinScraper(Webscraper):
         return full_datestamp
 
 
-    def get_product_data(self) -> dict:
+    def get_product_data(self):
         '''
         Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
 
@@ -203,8 +203,6 @@ class MyProteinScraper(Webscraper):
         product_link: str
             the xpath of the url link to an individual product
         '''       
-        product_dict = {}
-       
         product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
         
         product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
@@ -215,6 +213,26 @@ class MyProteinScraper(Webscraper):
             product_rating = 'None'
             pass
         
+        return product_name, product_price, product_rating
+
+
+    def create_product_dict(self, product_name, product_price, product_rating) -> dict:     #test these out!!
+        '''
+        Creates a product dictionary using the below parameters.
+
+        Parameters:
+        -----------
+        product_name:
+            the name of the product
+
+        product_price:
+            the price of the product
+
+        product_rating:
+            the customer review rating of the product
+        '''
+        product_dict = {}
+
         product_dict.update({
             "Product ID" : str(uuid.uuid4()),
             "Product Name" : product_name,
