@@ -1,7 +1,7 @@
 # Data_Collection_Project
 
 
-> The purpose of this project is to use a website to collect and build a dataset from. This will be done using a webscraper.
+> The purpose of this project was to use a website to collect and build a dataset from. This was be done using a webscraper.
 > Include here a brief description of the project, what technologies are used etc.
 
 ## Milestone 1 & 2
@@ -16,7 +16,7 @@
 ```python
 echo $PATH
 ```
-- Selenium is then installed and ready to use after entering the following into the command terminal:
+- Selenium was then installed and ready to use after entering the following into the command terminal:
 ```python
 pip install
 ```
@@ -36,7 +36,7 @@ Does what you have built in this milestone connect to the previous one? If so ex
 """Insert your code here"""
 ```
 
-- A scraper class is then created (WebScraper), along with methods to navigate the website such as to "Accept Cookies", "X" any email newsletter sign up pop-up's, and click any buttons.
+- A scraper class was then created (WebScraper), along with methods to navigate the website such as to "Accept Cookies", 'X' any email newsletter sign up pop-up's, and click any buttons. These were made to be as general as possible to ensure reusability in future projects.
 
 ```python
 class Webscraper:
@@ -104,7 +104,7 @@ class Webscraper:
         self.click_element(xpath)   # TODO: ensure code still runs if pop-up doesn't appear, use try/except clause
 ```
 
-- Next, a method is created to retrieve links to products on the page and store them in a list. This was done by navigating to a page in the webiste, clicking a "View All" button so that all the products were visible, and then using a for loop to iterate through each item and retrieve their 'href' links to store within a list. THis is shown in the code below:
+- Next, a method was created to retrieve links to products on the page and store them in a list. This was done by navigating to a page in the webiste, clicking a "View All" button so that all the products were visible, and then using a for loop to iterate through each item and retrieve their 'href' links to store within a list. This is shown in the code below:
 
  ```python 
  def nutrition_button_click(self, xpath: str = '//a[@class="responsiveFlyoutMenu_levelOneLink responsiveFlyoutMenu_levelOneLink-hasChildren"]'):
@@ -137,32 +137,26 @@ class Webscraper:
         time.sleep(1)
         nutrition_view_all = self.click_element(xpath)
         
-
     def find_product_links(self) -> list:
         '''
         Gets links to all products and stores the links to these in a list (product_link_list)
-
-        Parameters:
-        ----------
-        xpath: str
-            Xpath to each product
-        
-        xpath_container: str
-            Xpath to the container of all products
         '''
         product_link_list = []
 
         products = self.find_element_in_container('//ul[@class="productListProducts_products"]', 'li' )
         time.sleep(1)
 
-        for product in products: #finds each 'a' tag within list, finds the associated href (URL) and stores in a list
-            product_link = product.find_element(By.XPATH, './/a').get_attribute('href')
-            #a_tag = product.find_element(By.TAG_NAME('a'))
-            #product_link = a_tag.get_attribute('href')
-            product_link_list.append(product_link)
+        for product in products: 
+            try:
+                product_link = product.find_element(By.XPATH, './/div/div/a[@class="athenaProductBlock_linkImage"]').get_attribute('href')
+                product_link_list.append(product_link)
+            except:
+                pass
 
         return product_link_list
+
  ```
+- In find_product_links, the for-loop is within a try/except clause to avoid errors if an a-tag did not match the xpath specified.
 
 - Lastly, the class is initialised within a if _ _ name _ _ == "__main__" block, so that it only runs if this file is run directly rather than on any import.
 ```python
@@ -179,6 +173,72 @@ if __name__ == "__main__":
     scrape.open_all_nutrition_products()
     scrape.find_product_links()
 ```
+
+## Milestone 4
+- This milestone involved scraping data from each product link that we obtained in the previous milestone. The information to be retrieved included the following: product name, price, rating, image link, and the time the data was scraped. Each product was also assigned a unique ID. 
+
+- The product image was obtained using the following code:
+```python
+def get_product_image(self):
+    '''
+    Finds the href to the product image.
+
+    '''
+    time.sleep(1)
+    product_image = self.driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
+
+    return product_image
+```        
+- The exact time of data scraping was obtaining using the following code:
+```python
+@staticmethod
+def get_timestamp():
+    '''
+    Prints the timestamp of current time.
+    '''
+    now = datetime.now()
+
+    current_time = now.strftime("%H:%M:%S")
+
+    return current_time
+```    
+- Using the above code, the data for an individual product was scraped using the below:
+```python
+def get_product_data(self) -> dict:
+    '''
+    Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
+
+    Parameters:
+    -----------
+    product_link: str
+        the xpath of the url link to an individual product
+    '''       
+    product_dict = {}
+
+    product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
+
+    product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
+
+    try:
+        product_rating = self.driver.find_element(By.XPATH, '//span[@class="athenaProductReviews_aggregateRatingValue"]').text
+    except:
+        product_rating = 'None'
+        pass
+
+    product_dict.update({
+        "Product ID" : str(uuid.uuid4()),
+        "Product Name" : product_name,
+        "Price" : product_price,
+        "Rating" : product_rating,
+        "Time Scraped" : self.get_timestamp(),
+        "Image Link" : self.get_product_image()            
+        })
+
+    return product_dict
+```
+- As seen above, the unique product ID was generated using 'str(uuid.uuid4())'
+- 
+
 
 ## Milestone n
 
