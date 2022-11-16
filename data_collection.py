@@ -216,7 +216,7 @@ class MyProteinScraper(Webscraper):
         return product_name, product_price, product_rating
 
 
-    def create_product_dict(self, product_name, product_price, product_rating) -> dict:     #test these out!!
+    def create_product_dict(self, product_name, product_price, product_rating) -> dict:     
         '''
         Creates a product dictionary using the below parameters.
 
