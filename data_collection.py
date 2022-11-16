@@ -272,9 +272,7 @@ class MyProteinScraper(Webscraper):
             self.create_product_folder(filename)
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
             
-            image_src = self.get_product_image()        #finds and downloads the image before saving it
-            image_filename = self.get_date_and_timestamp()
-            self.download_image(image_src, image_filename)
+
 
             product_data_list_all.append(product_data)
                         
@@ -313,7 +311,7 @@ class MyProteinScraper(Webscraper):
             json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
 
 
-    def download_image(self, image_src, filename):
+    def download_image(self, image_src):
         '''
         Creates images folder if it doesn't already exist, and then downloads and saves the relevant .jpg image within it.
 
@@ -327,10 +325,15 @@ class MyProteinScraper(Webscraper):
         if not os.path.exists('images'):
             os.makedirs('images')
 
+        #image_src = self.get_product_image()        #to be this as parameter image_src when you call download_image
         image_src = requests.get(image_src).content
 
-        with open(f'images/{filename}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
+        image_filename = self.get_date_and_timestamp()
+
+        with open(f'images/{image_filename}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
             file.write(image_src)
+
+
 
 
 
