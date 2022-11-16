@@ -7,6 +7,7 @@ import time
 import uuid
 import os
 import json
+import requests
 
 class Webscraper:
 
@@ -205,7 +206,6 @@ class MyProteinScraper(Webscraper):
             product_rating = 'None'
             pass
         
-
         product_dict.update({
             "Product ID" : str(uuid.uuid4()),
             "Product Name" : product_name,
@@ -221,18 +221,17 @@ class MyProteinScraper(Webscraper):
     def scrape_pages(self, product_link_list) -> list:
         '''
         Iterates through URL links on webpage and scrape data from each, and stores the data in a list.
+        Function also downloads the associated image and stores in a folder with the product ID as the filename.
 
         Parameters:
         ----------
         product_link_list:
             list of URL's ("href" tags) for each product shown on the webpage.
         '''
-
         product_data_list_all= []   #list of product dictionaries
         
-        
-        for link in range(len(product_link_list)): 
-        #for link in range(0,2):                        #for testing
+        #for link in range(len(product_link_list)): 
+        for link in range(0,2):                        #for testing (be careful when removing as this will download ALL images - space on harddrive)
             
             product_link = product_link_list[link]
             self.driver.get(product_link)
@@ -241,10 +240,14 @@ class MyProteinScraper(Webscraper):
 
             product_data = self.get_product_data()
                  
-            filename = list(product_data.values())[0]   #indexes the product ID value and uses it for folder name     
+            filename = list(product_data.values())[0]   #indexes the product ID value and uses it for folder name   
+
             self.create_product_folder(filename)
 
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
+
+            image_src = self.get_product_image()        #finds and downloads the image before saving it
+            self.download_image(image_src, filename)
 
             product_data_list_all.append(product_data)
                         
@@ -269,7 +272,7 @@ class MyProteinScraper(Webscraper):
             os.makedirs(f'raw_data/{filename}')
 
 
-    def write_json(self,data,filename):
+    def write_json(self, data, filename):
         '''
         Writes the dictionary data to a json file and saves it within it's own product folder.
 
@@ -285,44 +288,41 @@ class MyProteinScraper(Webscraper):
             json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
 
 
-    def create_folder_images(self):
-        
+    def download_image(self, image_src, product_id):
+        '''
+        Creates images folder if it doesn't already exist, and then downloads and saves the relevant .jpg image within it.
+
+        Parameters:
+        ----------
+        image_src:
+            the URL of the image to be downloaded
+        product_id:
+            the unique product ID to be used as the filename for the image
+        '''
         if not os.path.exists('images'):
             os.makedirs('images')
 
-        
+        image_src = requests.get(image_src).content
+
+        with open(f'images/{product_id}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
+            file.write(image_src)
+
+ 
 
 
 
-    def scrape_image_links(self):
-
-
-
-
-# if __name__ == "__main__":
-    
-#     scrape = MyProteinScraper()
-#     scrape.close_email_signup()
-#     scrape.accept_cookies()
-#     scrape.nutrition_button_click()
-#     scrape.open_all_nutrition_products()
-#     #links = scrape.find_product_links()
-
-#     #print(links)
-
-#     #scrape.first_product_click()
 
 if __name__ == "__main__":
 
-    scrape = MyProteinScraper()
+    scrape=MyProteinScraper()
+
     scrape.close_email_signup()
     scrape.accept_cookies()
-    scrape.nutrition_button_click()
-    scrape.open_all_nutrition_products()
-    #links = scrape.find_product_links()
+    scrape.download_images()
+#   scrape.nutrition_button_click()
+#   scrape.open_all_nutrition_products()
+#  #links = scrape.find_product_links()
 
-    #print(links)
+#  #print(links)
 
-    #scrape.first_product_click()
-
-
+#   #scrape.first_product_click()
