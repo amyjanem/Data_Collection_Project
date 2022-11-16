@@ -185,6 +185,18 @@ class MyProteinScraper(Webscraper):
         return current_time
 
 
+    @staticmethod
+    def get_date_and_timestamp():
+        '''
+        Prints the current date and time.
+        '''
+        now = datetime.now()
+
+        full_datestamp = now.strftime("%d%m%Y_%H%M%S")
+
+        return full_datestamp
+
+
     def get_product_data(self) -> dict:
         '''
         Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
@@ -246,8 +258,10 @@ class MyProteinScraper(Webscraper):
 
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
 
+            
             image_src = self.get_product_image()        #finds and downloads the image before saving it
-            self.download_image(image_src, filename)
+            image_filename = self.get_date_and_timestamp()
+            self.download_image(image_src, image_filename)
 
             product_data_list_all.append(product_data)
                         
@@ -288,7 +302,7 @@ class MyProteinScraper(Webscraper):
             json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
 
 
-    def download_image(self, image_src, product_id):
+    def download_image(self, image_src, filename):
         '''
         Creates images folder if it doesn't already exist, and then downloads and saves the relevant .jpg image within it.
 
@@ -304,10 +318,8 @@ class MyProteinScraper(Webscraper):
 
         image_src = requests.get(image_src).content
 
-        with open(f'images/{product_id}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
+        with open(f'images/{filename}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
             file.write(image_src)
-
- 
 
 
 
