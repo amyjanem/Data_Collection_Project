@@ -247,8 +247,8 @@ class MyProteinScraper(Webscraper):
 
     def scrape_pages(self, product_link_list) -> list:
         '''
-        Iterates through URL links on webpage and scrape data from each, and stores the data in a list.
-        Method also downloads the associated image and stores in a folder with the product ID as the filename.
+        Iterates through URL links on webpage and scrapes data from each, and stores the data in a list.
+        
 
         Parameters:
         ----------
@@ -262,7 +262,6 @@ class MyProteinScraper(Webscraper):
             
             product_link = product_link_list[link]
             self.driver.get(product_link)
-
             time.sleep(1)
 
             product_data = self.get_product_data()
@@ -271,8 +270,6 @@ class MyProteinScraper(Webscraper):
 
             self.create_product_folder(filename)
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
-            
-
 
             product_data_list_all.append(product_data)
                         
@@ -313,14 +310,12 @@ class MyProteinScraper(Webscraper):
 
     def download_image(self, image_src):
         '''
-        Creates images folder if it doesn't already exist, and then downloads and saves the relevant .jpg image within it.
+        Creates 'images' folder if it doesn't already exist, and then downloads and saves the relevant .jpg image within it with the product ID as the filename.
 
         Parameters:
         ----------
         image_src:
             the URL of the image to be downloaded
-        product_id:
-            the unique product ID to be used as the filename for the image
         '''
         if not os.path.exists('images'):
             os.makedirs('images')
@@ -335,19 +330,28 @@ class MyProteinScraper(Webscraper):
 
 
 
-
-
-
 if __name__ == "__main__":
 
     scrape=MyProteinScraper()
 
     scrape.close_email_signup()
     scrape.accept_cookies()
+    scrape.nutrition_button_click()
+    scrape.open_all_nutrition_products()
+    links = scrape.find_product_links()
+    data_list_all = scrape.scrape_pages(links)
+    data_list_all[] #'index the image link?'
+    
+    #Question: Trying to split up my scrape pages and download image methods. Scrape_pages iterates through product links and collects data, including the image jpg. 
+    #Would the best way to get this link be to index each dictionary in the list to its image link, and then call download_images? Or another way?
+    #Or better to keep in the scrape pages method
+
+    #If indexing dictionary is the best way, how do I go about doing this?
+
     scrape.download_images()
-#   scrape.nutrition_button_click()
-#   scrape.open_all_nutrition_products()
-#  #links = scrape.find_product_links()
+    scrape.quit()
+#   
+#  #
 
 #  #print(links)
 
