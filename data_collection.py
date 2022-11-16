@@ -9,6 +9,7 @@ import os
 import json
 import requests
 
+
 class Webscraper:
 
 
@@ -20,7 +21,7 @@ class Webscraper:
     
     def click_element(self, xpath: str):
         '''
-        Finds a specific element on the webpage and clicks it
+        Finds a specific element on the webpage and clicks it.
 
         Parameters
         ---------
@@ -35,7 +36,7 @@ class Webscraper:
 
     def find_element_in_container(self, xpath_container: str, tag_elements: str) -> list:
         '''
-        Finds elements within a specifed container and stores them in a list
+        Finds elements within a specifed container and stores them in a list.
 
         Parameters
         ----------
@@ -47,14 +48,13 @@ class Webscraper:
         '''
         container = self.driver.find_element(By.XPATH, xpath_container)
         elements_in_container = container.find_elements(By.XPATH, f'./{tag_elements}')
-        #print(elements_in_container)
 
         return elements_in_container
 
 
     def scroll_website(self, scroll_height: int):
         '''
-        Scrolls to a specified point on the website. #is this a static method, along with click and find element? **
+        Scrolls to a specified point on the website. 
 
         Parameters:
         ----------
@@ -111,6 +111,8 @@ class MyProteinScraper(Webscraper):
         '''   
         time.sleep(1)
         nutrition_button = self.click_element(xpath)
+
+        return nutrition_button
         
 
     def open_all_nutrition_products(self, xpath: str = '//a[@class="sectionPeek_allCta sectionPeek_allCta-show"]'):
@@ -126,6 +128,8 @@ class MyProteinScraper(Webscraper):
         self.driver.execute_script("window.scrollTo(0, 1300)")
         time.sleep(1)
         nutrition_view_all = self.click_element(xpath)
+
+        return nutrition_view_all
         
 
     def find_product_links(self) -> list:
@@ -152,16 +156,15 @@ class MyProteinScraper(Webscraper):
         Clicks on the first product on the page. (for testing purposes for now!)
         '''
         time.sleep(1)
-        first_product = self.click_element('//a[@class="athenaProductBlock_linkImage"]')
+        first_product_link = self.click_element('//a[@class="athenaProductBlock_linkImage"]')
         time.sleep(1)
 
-
+        return first_product_link
 
 
     def get_product_image(self):
         '''
         Finds the href to the product image.
-
         '''
         time.sleep(1)
         product_image = self.driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
@@ -175,7 +178,6 @@ class MyProteinScraper(Webscraper):
         Prints the timestamp of current time.
         '''
         now = datetime.now()
-
         current_time = now.strftime("%H:%M:%S")
 
         return current_time
@@ -187,7 +189,6 @@ class MyProteinScraper(Webscraper):
         Prints the current date and time.
         '''
         now = datetime.now()
-
         full_datestamp = now.strftime("%d%m%Y_%H%M%S")
 
         return full_datestamp
@@ -229,7 +230,7 @@ class MyProteinScraper(Webscraper):
     def scrape_pages(self, product_link_list) -> list:
         '''
         Iterates through URL links on webpage and scrape data from each, and stores the data in a list.
-        Function also downloads the associated image and stores in a folder with the product ID as the filename.
+        Method also downloads the associated image and stores in a folder with the product ID as the filename.
 
         Parameters:
         ----------
@@ -251,9 +252,7 @@ class MyProteinScraper(Webscraper):
             filename = list(product_data.values())[0]   #indexes the product ID value and uses it for folder name   
 
             self.create_product_folder(filename)
-
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
-
             
             image_src = self.get_product_image()        #finds and downloads the image before saving it
             image_filename = self.get_date_and_timestamp()
@@ -275,8 +274,6 @@ class MyProteinScraper(Webscraper):
         '''
         if not os.path.exists('raw_data'):
             os.makedirs('raw_data')
-        # else:
-        #     print('raw_data directory already exists')
             
         if not os.path.exists(f'raw_data/{filename}'):
             os.makedirs(f'raw_data/{filename}')
