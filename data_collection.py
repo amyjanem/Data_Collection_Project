@@ -108,7 +108,6 @@ class MyProteinScraper(Webscraper):
         -----------
         xpath: str
             The xpath of the nutrition button
-
         '''   
         time.sleep(1)
         nutrition_button = self.click_element(xpath)
@@ -123,7 +122,6 @@ class MyProteinScraper(Webscraper):
         xpath: str
             Xpath of the 'View All' button on the NUtrition webpage
         '''
-        
         time.sleep(1)
         self.driver.execute_script("window.scrollTo(0, 1300)")
         time.sleep(1)
@@ -146,7 +144,6 @@ class MyProteinScraper(Webscraper):
             except:
                 pass
 
-        #print(len(product_link_list))
         return product_link_list
 
 
@@ -160,7 +157,6 @@ class MyProteinScraper(Webscraper):
 
 
 
-# TODO: Your dictionary should include all details for each record, its unique ID, timestamp of when it was scraped and links to any images associated with each record.
 
     def get_product_image(self):
         '''
