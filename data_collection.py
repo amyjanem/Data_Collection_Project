@@ -248,7 +248,6 @@ class MyProteinScraper(Webscraper):
     def scrape_pages(self, product_link_list) -> list:
         '''
         Iterates through URL links on webpage and scrapes data from each, and stores the data in a list.
-        
 
         Parameters:
         ----------
@@ -265,8 +264,9 @@ class MyProteinScraper(Webscraper):
             time.sleep(1)
 
             product_data = self.get_product_data()
+            product_dict = self.create_product_dict(product_data[0], product_data[1], product_data[2])
                  
-            filename = list(product_data.values())[0]   #indexes the product ID value and uses it for folder name   
+            filename = list(product_dict.values())[0]   #indexes the product ID value and uses it for folder name   
 
             self.create_product_folder(filename)
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
@@ -340,16 +340,20 @@ if __name__ == "__main__":
     scrape.open_all_nutrition_products()
     links = scrape.find_product_links()
     data_list_all = scrape.scrape_pages(links)
-    data_list_all[] #'index the image link?'
+    #data_list_all[] #'index the image link?'
     
+
+
     #Question: Trying to split up my scrape pages and download image methods. Scrape_pages iterates through product links and collects data, including the image jpg. 
     #Would the best way to get this link be to index each dictionary in the list to its image link, and then call download_images? Or another way?
     #Or better to keep in the scrape pages method
 
+
+
     #If indexing dictionary is the best way, how do I go about doing this?
 
-    scrape.download_images()
-    scrape.quit()
+    #scrape.download_images()
+    #scrape.quit()
 #   
 #  #
 
