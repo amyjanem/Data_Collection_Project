@@ -74,7 +74,6 @@ class Webscraper:
             This driver is already in the MyProtein webpage
         '''       
         try:
-            time.sleep(1) 
             self.click_element(xpath)
         except:
             pass
@@ -90,7 +89,21 @@ class Webscraper:
             The xpath of the "Accept Cookies" button
         '''
         try:
-            time.sleep(1)
+            self.click_element(xpath)
+        except:
+            pass
+
+
+    def click_next_page(self, xpath: str = '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]'):
+        '''
+        Clicks the 'Next' button to navigate to the next webpage
+
+        Parameters
+        ----------
+        xpath: str
+            The xpath of the "Next" button
+        '''
+        try:
             self.click_element(xpath)
         except:
             pass
@@ -245,37 +258,6 @@ class MyProteinScraper(Webscraper):
         return product_dict
 
 
-    def scrape_pages(self, product_link_list) -> list:
-        '''
-        Iterates through URL links on webpage and scrapes data from each, and stores the data in a list.
-
-        Parameters:
-        ----------
-        product_link_list:
-            list of URL's ("href" tags) for each product shown on the webpage.
-        '''
-        product_data_list_all= []   #list of product dictionaries
-        
-        #for link in range(len(product_link_list)): 
-        for link in range(0,2):                        #for testing (be careful when removing as this will download ALL images - space on harddrive)
-            
-            product_link = product_link_list[link]
-            self.driver.get(product_link)
-            time.sleep(1)
-
-            product_data = self.get_product_data()
-            product_dict = self.create_product_dict(product_data[0], product_data[1], product_data[2])
-                 
-            filename = list(product_dict.values())[0]   #indexes the product ID value and uses it for folder name   
-
-            self.create_product_folder(filename)
-            self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
-
-            product_data_list_all.append(product_data)
-                        
-        return product_data_list_all
-
-
     def create_product_folder(self, filename):
         '''
         Creates a folder called 'raw_data' if it doesn't already exist, and then creates a folder within that, with the unique product ID as the filename.
@@ -308,26 +290,69 @@ class MyProteinScraper(Webscraper):
             json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
 
 
-    def download_image(self, image_src):
+    def create_image_folder(self, filename):
         '''
-        Creates 'images' folder if it doesn't already exist, and then downloads and saves the relevant .jpg image within it with the product ID as the filename.
+        Creates 'images' folder if it doesn't already exist.
+        
+        Parameters:
+        -----------
+        filename:
+            the unique product ID to be used as a folder name.
+        '''
+        if not os.path.exists(f'raw_data/{filename}/images'):
+            os.makedirs(f'raw_data/{filename}/images')
+
+
+    def download_image(self, image_src, filename):
+        '''
+        Downloads and saves the relevant .jpg image within it with the product ID as the filename.
 
         Parameters:
         ----------
         image_src:
             the URL of the image to be downloaded
         '''
-        if not os.path.exists('images'):
-            os.makedirs('images')
-
-        #image_src = self.get_product_image()        #to be this as parameter image_src when you call download_image
         image_src = requests.get(image_src).content
 
         image_filename = self.get_date_and_timestamp()
 
-        with open(f'images/{image_filename}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
+        with open(f'raw_data/{filename}/images/{image_filename}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
             file.write(image_src)
 
+
+
+
+
+    def crawler(self, product_links):
+        '''
+        Web scraper for one page... Iterates through URL links on webpage and scrapes and saves relevant product and image data from each.
+        '''
+        product_data_list_all= []                       #list of product dictionaries
+        #product_links = self.find_product_links()
+        
+        #for link in range(len(product_links)): 
+        for link in range(0,1):                         #for testing (be careful when removing as this will download ALL images - space on harddrive)
+
+            #product_links = self.find_product_links()
+            product_link = product_links[link]
+            self.driver.get(product_link)
+            time.sleep(1)
+
+            product_data = self.get_product_data()
+            product_dict = self.create_product_dict(product_data[0], product_data[1], product_data[2])
+
+            filename = list(product_dict.values())[0]   #indexes the product ID value and uses it for folder name   
+
+            self.create_product_folder(filename)
+            self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
+
+            product_data_list_all.append(product_data)
+
+            #self.create_image_folder(filename)
+            #image = self.get_product_image()
+            #self.download_image(image, filename)
+        
+        return product_data_list_all
 
 
 if __name__ == "__main__":
@@ -338,25 +363,20 @@ if __name__ == "__main__":
     scrape.accept_cookies()
     scrape.nutrition_button_click()
     scrape.open_all_nutrition_products()
-    links = scrape.find_product_links()
-    data_list_all = scrape.scrape_pages(links)
-    #data_list_all[] #'index the image link?'
     
+    pages = scrape.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
+    for page in range(1, int(pages) + 1):
+        links = scrape.find_product_links()
+        time.sleep(2)
 
-    #Question: Trying to split up my scrape pages and download image methods. Scrape_pages iterates through product links and collects data, including the image jpg. 
-    #Would the best way to get this link be to index each dictionary in the list to its image link, and then call download_images? Or another way?
-    #Or better to keep in the scrape pages method
+        scrape.crawler(links)
+        time.sleep(2)
 
+        scrape.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
+        time.sleep(2)
 
+        scrape.click_next_page()
+        time.sleep(2)
 
-    #If indexing dictionary is the best way, how do I go about doing this?
-
-    #scrape.download_images()
-    #scrape.quit()
-#   
-#  #
-
-#  #print(links)
-
-#   #scrape.first_product_click()
+    scrape.driver.quit()
