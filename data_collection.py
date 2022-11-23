@@ -261,7 +261,8 @@ class MyProteinScraper(Webscraper):
         return product_dict
 
 
-    def _create_product_folder(self, filename):
+    @staticmethod
+    def _create_product_folder(filename):
         '''
         Creates a folder called 'raw_data' if it doesn't already exist, and then creates a folder within that, with the unique product ID as the filename.
 
@@ -293,7 +294,8 @@ class MyProteinScraper(Webscraper):
             json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
 
 
-    def _create_image_folder(self, filename):
+    @staticmethod
+    def _create_image_folder(filename):
         '''
         Creates 'images' folder if it doesn't already exist.
         
@@ -325,7 +327,7 @@ class MyProteinScraper(Webscraper):
             file.write(image_src)
 
 
-    def crawler(self, product_links):
+    def scraper(self, product_links):
         '''
         THe webscraper for one webpage, which iterates through URL links to find and save relevant product and image data from each.
         
@@ -371,11 +373,12 @@ if __name__ == "__main__":
     
     pages = scrape.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
+    #for page in range(1, 3):                   #for testing
     for page in range(1, int(pages) + 1):
         links = scrape._find_product_links()
         time.sleep(2)
 
-        scrape.crawler(links)
+        scrape.scraper(links)
         time.sleep(2)
 
         scrape.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
