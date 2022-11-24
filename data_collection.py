@@ -11,7 +11,9 @@ import uuid
 
 
 class Webscraper:
-
+    '''
+    Class inlcudes various methods to navigate through a website.
+    '''
 
     def __init__(self, url: str = "https://www.myprotein.com/"):
         self.driver = webdriver.Chrome()
@@ -47,6 +49,11 @@ class Webscraper:
         
         tag_elements: str
             The tag for the elements within the container.
+
+        Returns
+        -------
+        elements_in_container: list
+            A list of elements within the specified container.
         '''
         container = self.driver.find_element(By.XPATH, xpath_container)
         elements_in_container = container.find_elements(By.XPATH, f'./{tag_elements}')
@@ -58,7 +65,7 @@ class Webscraper:
         '''
         Scrolls to a specified point on the website. 
 
-        Parameters:
+        Parameters
         ----------
         scroll_height: int
             The desired height to scroll the webpage to.
@@ -70,9 +77,9 @@ class Webscraper:
         '''
         Open MyProtein and close email newletter sign up pop-up.
 
-        Parameters:
+        Parameters
         -------
-        xpath: 
+        xpath: str
             The xpath of the 'X' button to close the pop-up.
 
         '''       
@@ -126,7 +133,7 @@ class MyProteinScraper(Webscraper):
         '''
         Finds 'Nutrition' catergory button and clicks it.
 
-        Parameters:
+        Parameters
         -----------
         xpath: str
             The xpath of the nutrition button.
@@ -141,7 +148,7 @@ class MyProteinScraper(Webscraper):
         '''
         Clicks 'View All' button so that all Bestseller products are showing.
 
-        Parameters:
+        Parameters
         -----------
         xpath: str
             Xpath of the 'View All' button on the NUtrition webpage.
@@ -157,6 +164,11 @@ class MyProteinScraper(Webscraper):
     def _find_product_links(self) -> list:
         '''
         Gets links to all products and stores these in a list.
+
+        Returns
+        -------
+        product_link_list: list
+            A list of the URL links to each product on the page.
         '''
         product_link_list = []
 
@@ -187,6 +199,11 @@ class MyProteinScraper(Webscraper):
     def _get_product_image(self):
         '''
         Finds the 'href' (ie. link) to the product image.
+
+        Returns
+        -------
+        product_image: str
+            the URL link to the product image.
         '''
         time.sleep(1)
         product_image = self.driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
@@ -197,7 +214,12 @@ class MyProteinScraper(Webscraper):
     @staticmethod
     def _get_timestamp():
         '''
-        Prints the current timestamp.
+        Determines the current time and prints it in hours : minutes : seconds format.
+
+        Returns
+        -------
+        current_time: str
+            The current time
         '''
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
@@ -208,7 +230,12 @@ class MyProteinScraper(Webscraper):
     @staticmethod
     def _get_date_and_timestamp():
         '''
-        Prints the current date and time.
+        Determines the current date and time and prints it in 'day month year _ hour minute second' format.
+
+        Returns
+        -------
+        full_datestamp: str
+            The current time
         '''
         now = datetime.now()
         full_datestamp = now.strftime("%d%m%Y_%H%M%S")
@@ -218,7 +245,18 @@ class MyProteinScraper(Webscraper):
 
     def _get_product_data(self):
         '''
-        Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
+        Finds xpath of product name, price, and rating of product and converts the information to a string format.
+
+        Returns
+        -------
+        product_name: str
+            The name of the product.
+        
+        product_price: str
+            The price of the product.
+        
+        product_rating: str
+            The ratings of the product.
         '''       
         product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
         product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
@@ -236,16 +274,21 @@ class MyProteinScraper(Webscraper):
         '''
         Creates a product dictionary using the below parameters.
 
-        Parameters:
+        Parameters
         -----------
-        product_name:
+        product_name: str
             The name of the product.
 
-        product_price:
+        product_price: str
             The price of the product.
 
-        product_rating:
+        product_rating: str
             The customer review rating of the product.
+
+        Returns
+        -------
+        product_dict: dict
+            A dictionary of the product data containing name, price and rating.
         '''
         product_dict = {}
 
@@ -266,9 +309,9 @@ class MyProteinScraper(Webscraper):
         '''
         Creates a folder called 'raw_data' if it doesn't already exist, and then creates a folder within that, with the unique product ID as the filename.
 
-        Parameters:
-        -----------
-        filename:
+        Parameters
+        ----------
+        filename: str
             The unique product ID of each product.
         '''
         if not os.path.exists('raw_data'):
@@ -282,12 +325,12 @@ class MyProteinScraper(Webscraper):
         '''
         Writes the dictionary data to a json file and saves it within it's own product folder.
 
-        Parameters:
-        -----------
-        data:
+        Parameters
+        ----------
+        data: dict
             The product dictionary to be saved into the json format.
         
-        filename:
+        filename: str
             The unique product ID.
         '''
         with open(f'raw_data/{filename}/data.json', 'w') as file:
@@ -299,9 +342,9 @@ class MyProteinScraper(Webscraper):
         '''
         Creates 'images' folder if it doesn't already exist.
         
-        Parameters:
-        -----------
-        filename:
+        Parameters
+        ----------
+        filename: str
             The unique product ID.
         '''
         if not os.path.exists(f'raw_data/{filename}/images'):
@@ -312,12 +355,12 @@ class MyProteinScraper(Webscraper):
         '''
         Downloads and saves the relevant .jpg image within it with the product ID as the filename.
 
-        Parameters:
+        Parameters
         ----------
-        image_src:
+        image_src: str
             The URL of the image to be downloaded.
         
-        filename:
+        filename: str
             The unique product ID.
         '''
         image_src = requests.get(image_src).content
@@ -331,10 +374,15 @@ class MyProteinScraper(Webscraper):
         '''
         THe webscraper for one webpage, which iterates through URL links to find and save relevant product and image data from each.
         
-        Parameters:
+        Parameters
         ----------
-        product_links:
+        product_links: list
             The list of product URLs to all products on the webpage.
+
+        Returns
+        -------
+        product_data_list_all: list
+            A list of dictionaries of the product data
         '''
         product_data_list_all= []                       #list of product dictionaries
         
