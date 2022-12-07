@@ -14,7 +14,7 @@ class Webscraper:
         self.driver.maximize_window()
     
 
-    def click_element(self, xpath: str):
+    def _click_element(self, xpath: str):
         '''
         Finds a specific element on the webpage and clicks it.
 
@@ -31,7 +31,7 @@ class Webscraper:
         return element
 
 
-    def find_element_in_container(self, xpath_container: str, tag_elements: str) -> list:
+    def _find_element_in_container(self, xpath_container: str, tag_elements: str) -> list:
         '''
         Finds elements within a specifed container and stores them in a list.
 
@@ -54,7 +54,7 @@ class Webscraper:
         return elements_in_container
 
 
-    def scroll_website(self, scroll_height: int):
+    def _scroll_website(self, scroll_height: int):
         '''
         Scrolls to a specified point on the website. 
 
@@ -66,7 +66,7 @@ class Webscraper:
         self.driver.execute_script(f"window.scrollTo(0, {scroll_height})")
 
 
-    def close_email_signup(self, xpath: str = '//button[@class="emailReengagement_close_button"]'):
+    def _close_email_signup(self, xpath: str = '//button[@class="emailReengagement_close_button"]'):
         '''
         Open MyProtein and close email newletter sign up pop-up.
 
@@ -84,7 +84,7 @@ class Webscraper:
         return email_signup_button
 
 
-    def accept_cookies(self, xpath: str = '//button[@class="cookie_modal_button"]'):
+    def _accept_cookies(self, xpath: str = '//button[@class="cookie_modal_button"]'):
         '''
         Accepts the cookies on the webpage.
         
@@ -101,7 +101,7 @@ class Webscraper:
         return accept_cookies_button
 
 
-    def click_next_page(self, xpath: str = '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]'):
+    def _click_next_page(self, xpath: str = '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]'):
         '''
         Clicks the 'Next' button to navigate to the next webpage.
 

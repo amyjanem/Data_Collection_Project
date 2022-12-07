@@ -57,7 +57,7 @@ class MyProteinScraper(Webscraper):
         '''
         product_link_list = []
 
-        products = self.find_element_in_container('//ul[@class="productListProducts_products"]', 'li' )
+        products = self._find_element_in_container('//ul[@class="productListProducts_products"]', 'li' )
         time.sleep(1)
 
         for product in products: #finds each 'a' tag within list, finds the associated href (URL) and stores in a list
@@ -75,7 +75,7 @@ class MyProteinScraper(Webscraper):
         Clicks on the first product on the page. 
         '''
         time.sleep(1)
-        first_product_link = self.click_element('//a[@class="athenaProductBlock_linkImage"]')
+        first_product_link = self._click_element('//a[@class="athenaProductBlock_linkImage"]')
         time.sleep(1)
 
         return first_product_link
@@ -299,8 +299,8 @@ if __name__ == "__main__":
 
     scrape=MyProteinScraper()
 
-    scrape.close_email_signup()
-    scrape.accept_cookies()
+    scrape._close_email_signup()
+    scrape._accept_cookies()
     scrape._nutrition_button_click()
     scrape._open_all_nutrition_products()
     
