@@ -12,6 +12,7 @@ class Webscraper:
         self.driver = webdriver.Chrome()
         self.driver.get(url)
         self.driver.maximize_window()
+        time.sleep(1)
     
 
     def _click_element(self, xpath: str):
@@ -77,7 +78,8 @@ class Webscraper:
 
         '''       
         try:
-            email_signup_button = self.click_element(xpath)
+            email_signup_button = self._click_element(xpath)
+            time.sleep(1)
         except:
             pass
             
@@ -94,7 +96,8 @@ class Webscraper:
             The xpath of the "Accept Cookies" button.
         '''
         try:
-            accept_cookies_button = self.click_element(xpath)
+            accept_cookies_button = self._click_element(xpath)
+            time.sleep(1)
         except:
             pass
 
@@ -111,7 +114,7 @@ class Webscraper:
             The xpath of the "Next" button.
         '''
         try:
-            next_page_button = self.click_element(xpath)
+            next_page_button = self._click_element(xpath)
         except:
             pass
 

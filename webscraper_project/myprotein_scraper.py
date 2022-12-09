@@ -4,11 +4,11 @@ import os
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import time
 import uuid
-from webscraper_project.webscraper_module import Webscraper
+from webscraper_module import Webscraper
 
 
 class MyProteinScraper(Webscraper):    
@@ -23,8 +23,8 @@ class MyProteinScraper(Webscraper):
         xpath: str
             The xpath of the nutrition button.
         '''   
+        nutrition_button = self._click_element(xpath)
         time.sleep(1)
-        nutrition_button = self.click_element(xpath)
 
         return nutrition_button
         
@@ -38,10 +38,10 @@ class MyProteinScraper(Webscraper):
         xpath: str
             Xpath of the 'View All' button on the NUtrition webpage.
         '''
-        time.sleep(1)
         self.driver.execute_script("window.scrollTo(0, 1300)")
         time.sleep(1)
-        nutrition_view_all = self.click_element(xpath)
+        nutrition_view_all = self._click_element(xpath)
+        time.sleep(1)
 
         return nutrition_view_all
         
@@ -155,7 +155,7 @@ class MyProteinScraper(Webscraper):
         return product_name, product_price, product_rating
 
 
-    def _create_product_dict(self, product_name, product_price, product_rating) -> dict:     
+    def create_product_dict(self, product_name, product_price, product_rating) -> dict:     
         '''
         Creates a product dictionary using the below parameters.
 
@@ -190,7 +190,7 @@ class MyProteinScraper(Webscraper):
 
 
     @staticmethod
-    def _create_product_folder(filename):
+    def create_product_folder(filename):
         '''
         Creates a folder called 'raw_data' if it doesn't already exist, and then creates a folder within that, with the unique product ID as the filename.
 
@@ -206,7 +206,7 @@ class MyProteinScraper(Webscraper):
             os.makedirs(f'raw_data/{filename}')
 
 
-    def _write_json(self, data, filename):
+    def write_json(self, data, filename):
         '''
         Writes the dictionary data to a json file and saves it within it's own product folder.
 
@@ -223,7 +223,7 @@ class MyProteinScraper(Webscraper):
 
 
     @staticmethod
-    def _create_image_folder(filename):
+    def create_image_folder(filename):
         '''
         Creates 'images' folder if it doesn't already exist.
         
@@ -236,7 +236,7 @@ class MyProteinScraper(Webscraper):
             os.makedirs(f'raw_data/{filename}/images')
 
 
-    def _download_image(self, image_src, filename):
+    def download_image(self, image_src, filename):
         '''
         Downloads and saves the relevant .jpg image within it with the product ID as the filename.
 
@@ -255,7 +255,7 @@ class MyProteinScraper(Webscraper):
             file.write(image_src)
 
 
-    def scraper(self, product_links):
+    def scrape_one_page(self, product_links):
         '''
         THe webscraper for one webpage, which iterates through URL links to find and save relevant product and image data from each.
         
@@ -279,39 +279,69 @@ class MyProteinScraper(Webscraper):
             time.sleep(1)
 
             product_data = self._get_product_data()
-            product_dict = self._create_product_dict(product_data[0], product_data[1], product_data[2])
+            product_dict = self.create_product_dict(product_data[0], product_data[1], product_data[2])
 
             filename = list(product_dict.values())[0]    #indexes the product ID value and uses it for folder name   
 
-            self._create_product_folder(filename)
-            self._write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
+            self.create_product_folder(filename)
+            self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
 
             product_data_list_all.append(product_data)
 
-            self._create_image_folder(filename)
+            self.create_image_folder(filename)
             image = self._get_product_image()
-            self._download_image(image, filename)
+            self.download_image(image, filename)
         
         return product_data_list_all
+
+
+    def scrape_all_pages(self):
+
+        pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
+
+        for page in range(1, 3):                   #for testing
+        #for page in range(1, int(pages) + 1):
+            links = self._find_product_links()
+            time.sleep(2)
+
+            self.scrape_one_page(links)
+            time.sleep(2)
+
+            self.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
+            time.sleep(2)
+
+            try:
+                WebDriverWait(self, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
+                self._click_next_page()
+                time.sleep(2)
+            except:
+                self.driver.quit()
+
+
+
+
 
 
 if __name__ == "__main__":
 
     scrape=MyProteinScraper()
 
-    scrape._close_email_signup()
-    scrape._accept_cookies()
+    scrape._close_email_signup()        
+    scrape._accept_cookies()            
     scrape._nutrition_button_click()
     scrape._open_all_nutrition_products()
+    scrape.scrape_all_pages()
     
+
+
     pages = scrape.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
-    #for page in range(1, 3):                   #for testing
-    for page in range(1, int(pages) + 1):
+    for page in range(1, 3):                   #for testing
+    #for page in range(1, int(pages) + 1):
         links = scrape._find_product_links()
         time.sleep(2)
 
-        scrape.scraper(links)
+        scrape.scrape_one_page(links)
         time.sleep(2)
 
         scrape.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
@@ -319,7 +349,7 @@ if __name__ == "__main__":
 
         try:
             WebDriverWait(scrape, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
-            scrape.click_next_page()
+            scrape._click_next_page()
             time.sleep(2)
         except:
             scrape.driver.quit()
