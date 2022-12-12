@@ -8,7 +8,7 @@ class Webscraper:
     Class includes various methods to navigate through a website.
     '''
 
-    def __init__(self, url: str = "https://www.myprotein.com/"):
+    def __init__(self, url: str = "https://www.myprotein.com/"):    #in future can put URL straight to nutrition page to save time
         self.driver = webdriver.Chrome()
         self.driver.get(url)
         self.driver.maximize_window()

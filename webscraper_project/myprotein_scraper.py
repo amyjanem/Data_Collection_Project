@@ -320,9 +320,7 @@ class MyProteinScraper(Webscraper):
 
 
 
-
-
-if __name__ == "__main__":
+if __name__ == "__main__":          
 
     scrape=MyProteinScraper()
 
@@ -333,7 +331,7 @@ if __name__ == "__main__":
     scrape.scrape_all_pages()
     
 
-
+    #TODO: this has been put into own method. Delete the below and call method.
     pages = scrape.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
     for page in range(1, 3):                   #for testing
