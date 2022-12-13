@@ -336,6 +336,188 @@ if __name__ == "__main__":
             file.write(image_src)    
 ```
 
+## Milestone 5
+
+This milestone was all about optimising code, and setting up testing for the code using unit tests to ensure each part worked as desired.
+
+- The code was first refactored and optimised by doing the following:
+    - Methods were made sure to be appropriately named, and clear
+    - Repeated code was closely scrutinised and optimised
+    - Methods were ensured to have one concern where possible, for simplification and ease of testing
+    - Methods were made private where necessary (more on this below)
+    - Ensure docstrings were consistent throughout all methods
+    - Break up any nested loops where necessary
+    
+- The scraper() method was namely broken up here into two functions represented below:
+```python
+def scrape_one_page(self, product_links) -> list:
+        '''
+        The webscraper for one webpage, which iterates through URL links to find and save relevant product and image data from each.
+        
+        Parameters
+        ----------
+        product_links: list
+            The list of product URLs to all products on the webpage.
+
+        Returns
+        -------
+        product_data_list_all: list
+            A list of dictionaries of the product data
+        '''
+        product_data_list_all= []                       #list of product dictionaries
+        
+        #for link in range(len(product_links)):         #used to retrieve data from all products on page
+        for link in range(0,2):                         #used for testing and to protect space on harddrive when downloading images
+
+            product_link = product_links[link]
+            self.driver.get(product_link)
+            time.sleep(1)
+
+            product_data = self._get_product_data()
+            product_dict = self.create_product_dict(product_data[0], product_data[1], product_data[2])
+
+            filename = list(product_dict.values())[0]   #indexes the product ID value and uses it for folder name   
+
+            self.create_product_folder(filename)
+            self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
+
+            product_data_list_all.append(product_data)
+
+            self.create_image_folder(filename)
+            image = self._get_product_image()
+            self.download_image(image, filename)
+        
+        return product_data_list_all
+
+
+    def scrape_all_pages(self):
+
+        pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
+
+        #for page in range(1, 3):                   #for testing
+        for page in range(1, int(pages) + 1):       #used to scrape all pages
+            links = self._find_product_links()
+            print('product links found\n\n')
+            time.sleep(2)
+
+            self.scrape_one_page(links)
+            print('page scraped \n\n')
+            time.sleep(2)
+
+            self.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
+            time.sleep(2)
+
+            try:
+                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@aria-label="Next page"]')))  
+                time.sleep(2)
+                self._click_next_page()
+                print('next page clicked...\n\n')
+                time.sleep(2)
+            except:
+                print('next page NOT clicked, quitting page now...\n\n')
+                self.driver.quit()
+```
+
+- The following methods were kept as public, whereas the remainder of the methods were made private:
+    - create_product_dict, create_product_folder, write_json, create_image_folder, download_image, scrape_one_page, and scrape_all_pages
+
+- The if __name__ = '__main__' block was also updated to the below:
+```python
+if __name__ == "__main__":          
+
+    scrape=MyProteinScraper()
+
+    scrape._close_email_signup()        
+    scrape._accept_cookies()            
+    scrape._nutrition_button_click()
+    scrape._open_all_nutrition_products()
+    scrape.scrape_all_pages()
+```
+
+- A file was then created to insert all of the unit tests into. The unit tests tested all of the public methods and this can be seen below:
+```python
+import unittest
+import os
+import shutil
+import sys
+sys.path.append(r"C:\Users\amyma\AiCore Projects\Data_Collection_Project")
+from myprotein_scraper import MyProteinScraper
+
+
+class TestMyProteinScraper_1(unittest.TestCase):
+    
+
+    def setUp(self):
+        self.scrape = MyProteinScraper()             
+        self.scrape._close_email_signup()            
+        self.scrape._accept_cookies()
+        self.scrape._nutrition_button_click()
+        self.scrape._open_all_nutrition_products()
+        print('setUp method called...\n\n')          #for testing
+
+
+
+
+
+
+
+[insert finished testing code here]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TestMyProteinScraper_2(unittest.TestCase):
+
+
+    def setUp(self):
+        self.scrape = MyProteinScraper()
+
+    def test_create_image_folder(self):            #pass
+        random_directory = os.makedirs('random_name') 
+        self.scrape.create_image_folder(random_directory)
+        self.assertTrue(os.path.exists('raw_data/{random_directory}/images'), 'Image folder path does not exist')
+
+    def test_create_product_folder(self):          #pass           
+        self.scrape.create_product_folder('random_name')
+        self.assertTrue(os.path.exists('raw_data/random_name'), 'Product folder path does not exist')
+        os.rmdir('raw_data/random_name')
+
+    def test_write_json(self):                     #pass                      
+        os.makedirs('raw_data/test_filename')
+
+        self.scrape.write_json({'Price' : '£10.50'}, 'test_filename')
+        self.assertTrue(os.path.exists('raw_data/test_filename/data.json'), 'Directory path is incorrect/does not exist')
+
+        os.remove(f'raw_data/test_filename/data.json')
+        os.rmdir(f'raw_data/test_filename')
+
+
+    def test_download_image(self):                   #pass
+        test_image_src = "http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc"
+        test_image_filename = 'test_image_filename'
+        
+        os.makedirs('raw_data/test_image_filename/images')
+        self.scrape.download_image(test_image_src, test_image_filename)
+
+        self.assertTrue(os.path.exists(f'raw_data/{test_image_filename}/images/{self.scrape._get_date_and_timestamp()}.jpg'))  
+
+    def tearDown(self):    
+        shutil.rmtree('raw_data')
+   
+
+if __name__ == '__main__':
+    unittest.main(argv=[''], verbosity=2, exit=False)
+```
 
 ## Milestone n
 
