@@ -281,7 +281,7 @@ class MyProteinScraper(Webscraper):
             product_data = self._get_product_data()
             product_dict = self.create_product_dict(product_data[0], product_data[1], product_data[2])
 
-            filename = list(product_dict.values())[0]    #indexes the product ID value and uses it for folder name   
+            filename = list(product_dict.values())[0]   #indexes the product ID value and uses it for folder name   
 
             self.create_product_folder(filename)
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above

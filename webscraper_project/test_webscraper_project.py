@@ -15,7 +15,7 @@ class TestMyProteinScraper_1(unittest.TestCase):
         self.scrape._accept_cookies()
         self.scrape._nutrition_button_click()
         self.scrape._open_all_nutrition_products()
-        print('setUp method called...\n\n')              #for testing
+        print('setUp method called...\n\n')          #for testing
 
     # def test_create_product_dict(self):            #pass
     #     self.scrape._first_product_click()
