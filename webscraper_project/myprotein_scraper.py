@@ -271,8 +271,8 @@ class MyProteinScraper(Webscraper):
         '''
         product_data_list_all= []                       #list of product dictionaries
         
-        for link in range(len(product_links)): 
-        #for link in range(0,2):                         #for testing (be careful when removing as this will download ALL images - space on harddrive)
+        #for link in range(len(product_links)): 
+        for link in range(0,2):                         #for testing (be careful when removing as this will download ALL images - space on harddrive)
 
             product_link = product_links[link]
             self.driver.get(product_link)
@@ -288,9 +288,9 @@ class MyProteinScraper(Webscraper):
 
             product_data_list_all.append(product_data)
 
-            #self.create_image_folder(filename)
-            #image = self._get_product_image()
-            #self.download_image(image, filename)
+            self.create_image_folder(filename)
+            image = self._get_product_image()
+            self.download_image(image, filename)
         
         return product_data_list_all
 
@@ -299,25 +299,28 @@ class MyProteinScraper(Webscraper):
 
         pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
-        for page in range(1, 3):                   #for testing
-        #for page in range(1, int(pages) + 1):
+        #for page in range(1, 3):                   #for testing
+        for page in range(1, int(pages) + 1):
             links = self._find_product_links()
+            print('product links found\n\n')
             time.sleep(2)
 
             self.scrape_one_page(links)
+            print('page scraped \n\n')
             time.sleep(2)
 
             self.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
             time.sleep(2)
 
             try:
-                WebDriverWait(self, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
+                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@aria-label="Next page"]')))   #alternative xpath: //button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
+                time.sleep(2)
                 self._click_next_page()
+                print('next page clicked...\n\n')
                 time.sleep(2)
             except:
+                print('next page NOT clicked, quitting page now...\n\n')
                 self.driver.quit()
-
-
 
 
 if __name__ == "__main__":          
@@ -331,24 +334,24 @@ if __name__ == "__main__":
     scrape.scrape_all_pages()
     
 
-    #TODO: this has been put into own method. Delete the below and call method.
-    pages = scrape.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
+    # #TODO: this has been put into own method. Delete the below and call method.
+    # pages = scrape.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
-    for page in range(1, 3):                   #for testing
-    #for page in range(1, int(pages) + 1):
-        links = scrape._find_product_links()
-        time.sleep(2)
+    # for page in range(1, 3):                   #for testing
+    # ##for page in range(1, int(pages) + 1):
+    #     links = scrape._find_product_links()
+    #     time.sleep(2)
 
-        scrape.scrape_one_page(links)
-        time.sleep(2)
+    #     scrape.scrape_one_page(links)
+    #     time.sleep(2)
 
-        scrape.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
-        time.sleep(2)
+    #     scrape.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
+    #     time.sleep(2)
 
-        try:
-            WebDriverWait(scrape, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
-            scrape._click_next_page()
-            time.sleep(2)
-        except:
-            scrape.driver.quit()
+    #     try:
+    #         WebDriverWait(scrape, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
+    #         scrape._click_next_page()
+    #         time.sleep(2)
+    #     except:
+    #         scrape.driver.quit()
 

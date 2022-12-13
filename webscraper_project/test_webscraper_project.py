@@ -23,12 +23,6 @@ class TestMyProteinScraper_1(unittest.TestCase):
     #     self.assertIsInstance(test_dict, dict)
     #     print('create_product_dict returns a dictionary')
 
-
-    # def test_create_image_folder(self):            #pass
-    #     random_directory = os.makedirs('random_name') 
-    #     self.scrape.create_image_folder(random_directory)
-    #     self.assertTrue(os.path.exists('raw_data/{random_directory}/images'), 'Image folder path does not exist')
-
     # def test_scrape_one_page(self):                 #pass
     #     link_list = self.scrape._find_product_links()
     #     link_length = len(link_list)
@@ -40,7 +34,7 @@ class TestMyProteinScraper_1(unittest.TestCase):
 
 
     def test_scrape_all_pages(self):
-        
+        pass
 
 
 
@@ -52,8 +46,13 @@ class TestMyProteinScraper_1(unittest.TestCase):
 # class TestMyProteinScraper_2(unittest.TestCase):
 
 
-#     def setUp(self):
-#             self.scrape = MyProteinScraper()
+    # def setUp(self):
+    #     self.scrape = MyProteinScraper()
+
+    # def test_create_image_folder(self):            #pass
+    #     random_directory = os.makedirs('random_name') 
+    #     self.scrape.create_image_folder(random_directory)
+    #     self.assertTrue(os.path.exists('raw_data/{random_directory}/images'), 'Image folder path does not exist')
 
     # def test_create_product_folder(self):          pass           
     #     self.scrape.create_product_folder('random_name')
@@ -82,11 +81,9 @@ class TestMyProteinScraper_1(unittest.TestCase):
     #     self.assertTrue(os.path.exists(f'raw_data/{test_image_filename}/images/{self.scrape._get_date_and_timestamp()}.jpg')) #file with time stamp not found, how to call 
 
 
-
     # def tearDown(self):    
     #     shutil.rmtree('raw_data')
    
-
 
 
 if __name__ == '__main__':

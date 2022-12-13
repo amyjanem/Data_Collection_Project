@@ -104,7 +104,8 @@ class Webscraper:
         return accept_cookies_button
 
 
-    def _click_next_page(self, xpath: str = '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]'):
+    def _click_next_page(self, xpath: str = '//button[@aria-label="Next page"]'):
+    #'//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]'):
         '''
         Clicks the 'Next' button to navigate to the next webpage.
 
