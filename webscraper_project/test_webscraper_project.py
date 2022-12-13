@@ -15,7 +15,7 @@ class TestMyProteinScraper_1(unittest.TestCase):
         self.scrape._accept_cookies()
         self.scrape._nutrition_button_click()
         self.scrape._open_all_nutrition_products()
-        print('setUp method called...')              #for testing
+        print('setUp method called...\n\n')              #for testing
 
     # def test_create_product_dict(self):            #pass
     #     self.scrape._first_product_click()
@@ -37,7 +37,6 @@ class TestMyProteinScraper_1(unittest.TestCase):
         pass
 
 
-
     def tearDown(self):
         self.scrape.driver.quit()
 
@@ -46,20 +45,20 @@ class TestMyProteinScraper_1(unittest.TestCase):
 # class TestMyProteinScraper_2(unittest.TestCase):
 
 
-    # def setUp(self):
-    #     self.scrape = MyProteinScraper()
+#     def setUp(self):
+#         self.scrape = MyProteinScraper()
 
     # def test_create_image_folder(self):            #pass
     #     random_directory = os.makedirs('random_name') 
     #     self.scrape.create_image_folder(random_directory)
     #     self.assertTrue(os.path.exists('raw_data/{random_directory}/images'), 'Image folder path does not exist')
 
-    # def test_create_product_folder(self):          pass           
+    # def test_create_product_folder(self):          #pass           
     #     self.scrape.create_product_folder('random_name')
     #     self.assertTrue(os.path.exists('raw_data/random_name'), 'Product folder path does not exist')
     #     os.rmdir('raw_data/random_name')
 
-    # def test_write_json(self):                     pass                      
+    # def test_write_json(self):                     #pass                      
     #     os.makedirs('raw_data/test_filename')
 
     #     self.scrape.write_json({'Price' : '£10.50'}, 'test_filename')
@@ -69,16 +68,14 @@ class TestMyProteinScraper_1(unittest.TestCase):
     #     os.rmdir(f'raw_data/test_filename')
 
 
-    # def test_download_image(self):  #not passing - need help
+    # def test_download_image(self):                   #pass
     #     test_image_src = "http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc"
     #     test_image_filename = 'test_image_filename'
         
-    #     os.makedirs('raw_data/test_filename/images')
-    #     #test_image_id = self.scrape._get_date_and_timestamp()
-
+    #     os.makedirs('raw_data/test_image_filename/images')
     #     self.scrape.download_image(test_image_src, test_image_filename)
 
-    #     self.assertTrue(os.path.exists(f'raw_data/{test_image_filename}/images/{self.scrape._get_date_and_timestamp()}.jpg')) #file with time stamp not found, how to call 
+    #     self.assertTrue(os.path.exists(f'raw_data/{test_image_filename}/images/{self.scrape._get_date_and_timestamp()}.jpg'))  
 
 
     # def tearDown(self):    

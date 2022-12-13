@@ -332,26 +332,4 @@ if __name__ == "__main__":
     scrape._nutrition_button_click()
     scrape._open_all_nutrition_products()
     scrape.scrape_all_pages()
-    
-
-    # #TODO: this has been put into own method. Delete the below and call method.
-    # pages = scrape.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
-
-    # for page in range(1, 3):                   #for testing
-    # ##for page in range(1, int(pages) + 1):
-    #     links = scrape._find_product_links()
-    #     time.sleep(2)
-
-    #     scrape.scrape_one_page(links)
-    #     time.sleep(2)
-
-    #     scrape.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
-    #     time.sleep(2)
-
-    #     try:
-    #         WebDriverWait(scrape, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
-    #         scrape._click_next_page()
-    #         time.sleep(2)
-    #     except:
-    #         scrape.driver.quit()
 
