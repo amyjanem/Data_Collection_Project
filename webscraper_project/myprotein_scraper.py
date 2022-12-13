@@ -4,6 +4,7 @@ import os
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import time
@@ -285,12 +286,14 @@ class MyProteinScraper(Webscraper):
 
             self.create_product_folder(filename)
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
+            print('Product folders created, and product data saved... \n\n')
 
             product_data_list_all.append(product_data)
 
             self.create_image_folder(filename)
             image = self._get_product_image()
             self.download_image(image, filename)
+            print('Product image downloaded and saved...\n\n')
         
         return product_data_list_all
 
@@ -299,14 +302,14 @@ class MyProteinScraper(Webscraper):
 
         pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
-        #for page in range(1, 3):                   #for testing
-        for page in range(1, int(pages) + 1):
+        for page in range(1, 3):                   #for testing
+        #for page in range(1, int(pages) + 1):
             links = self._find_product_links()
-            print('product links found\n\n')
+            print('Product links found...\n\n')
             time.sleep(2)
 
             self.scrape_one_page(links)
-            print('page scraped \n\n')
+            print('Page scraped... \n\n')
             time.sleep(2)
 
             self.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
@@ -316,16 +319,16 @@ class MyProteinScraper(Webscraper):
                 WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@aria-label="Next page"]')))   #alternative xpath: //button[@class="responsivePaginationNavigationButton paginationNavigationButtonNext"]')))
                 time.sleep(2)
                 self._click_next_page()
-                print('next page clicked...\n\n')
+                print('Next page clicked...\n\n')
                 time.sleep(2)
             except:
-                print('next page NOT clicked, quitting page now...\n\n')
+                print('Quitting page now...\n\n')
                 self.driver.quit()
 
 
 if __name__ == "__main__":          
-
-    scrape=MyProteinScraper()
+    
+    scrape = MyProteinScraper()
 
     scrape._close_email_signup()        
     scrape._accept_cookies()            

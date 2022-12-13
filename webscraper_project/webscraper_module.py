@@ -1,3 +1,5 @@
+#from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
@@ -10,6 +12,19 @@ class Webscraper:
 
     def __init__(self, url: str = "https://www.myprotein.com/"):    #in future can put URL straight to nutrition page to save time
         self.driver = webdriver.Chrome()
+
+        self.options = webdriver.ChromeOptions()
+        self.options.add_argument('--headless')
+        self.options.add_argument('--window-size=1920,1080')
+        self.options.add_argument("--disable-gpu")
+        self.options.add_argument("--disable-extensions")
+        self.options.add_argument("--disable-infobars")
+        self.options.add_argument("--disable-notifications")
+        self.options.add_argument('--no-sandbox')
+        self.options.add_argument('--disable-dev-shm-usage')
+
+        self.driver = webdriver.Chrome(options = self.options)
+  
         self.driver.get(url)
         self.driver.maximize_window()
         time.sleep(1)
@@ -79,6 +94,7 @@ class Webscraper:
         '''       
         try:
             email_signup_button = self._click_element(xpath)
+            print('Email sign-up closed...\n\n')
             time.sleep(1)
         except:
             pass
@@ -97,6 +113,7 @@ class Webscraper:
         '''
         try:
             accept_cookies_button = self._click_element(xpath)
+            print('Cookies accepted...\n\n')
             time.sleep(1)
         except:
             pass
