@@ -81,7 +81,7 @@ class MyProteinScraper(Webscraper):
         return first_product_link
 
 
-    def _get_product_image(self):
+    def _get_product_image(self) -> str:
         '''
         Finds the 'href' (ie. link) to the product image.
 
@@ -97,7 +97,7 @@ class MyProteinScraper(Webscraper):
 
 
     @staticmethod
-    def _get_timestamp():
+    def _get_timestamp() -> str:
         '''
         Determines the current time and prints it in hours : minutes : seconds format.
 
@@ -113,7 +113,7 @@ class MyProteinScraper(Webscraper):
 
 
     @staticmethod
-    def _get_date_and_timestamp():
+    def _get_date_and_timestamp() -> str:
         '''
         Determines the current date and time and prints it in 'day month year _ hour minute second' format.
 
@@ -128,7 +128,7 @@ class MyProteinScraper(Webscraper):
         return full_datestamp
 
 
-    def _get_product_data(self):
+    def _get_product_data(self) -> str:
         '''
         Finds xpath of product name, price, and rating of product and converts the information to a string format.
 
@@ -255,7 +255,7 @@ class MyProteinScraper(Webscraper):
             file.write(image_src)
 
 
-    def scrape_one_page(self, product_links):
+    def scrape_one_page(self, product_links) -> list:
         '''
         THe webscraper for one webpage, which iterates through URL links to find and save relevant product and image data from each.
         
@@ -271,8 +271,8 @@ class MyProteinScraper(Webscraper):
         '''
         product_data_list_all= []                       #list of product dictionaries
         
-        #for link in range(len(product_links)): 
-        for link in range(0,2):                         #for testing (be careful when removing as this will download ALL images - space on harddrive)
+        for link in range(len(product_links)): 
+        #for link in range(0,2):                         #for testing (be careful when removing as this will download ALL images - space on harddrive)
 
             product_link = product_links[link]
             self.driver.get(product_link)
@@ -288,9 +288,9 @@ class MyProteinScraper(Webscraper):
 
             product_data_list_all.append(product_data)
 
-            self.create_image_folder(filename)
-            image = self._get_product_image()
-            self.download_image(image, filename)
+            #self.create_image_folder(filename)
+            #image = self._get_product_image()
+            #self.download_image(image, filename)
         
         return product_data_list_all
 
