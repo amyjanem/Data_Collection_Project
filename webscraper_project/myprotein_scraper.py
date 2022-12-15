@@ -298,12 +298,13 @@ class MyProteinScraper(Webscraper):
         return product_data_list_all
 
 
-    def scrape_all_pages(self):
+    def scrape_all_pages(self, pages_num):
 
-        pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
+        total_pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
 
-        for page in range(1, 3):                   #for testing
-        #for page in range(1, int(pages) + 1):
+        #for page in range(1, 3):                        #for testing, only 2 pages
+        #for page in range(1, int(total_pages) + 1):     #test all pages
+        for page in range(1, pages_num + 1):             #scrape specified amount of pages
             links = self._find_product_links()
             print('Product links found...\n\n')
             time.sleep(2)
@@ -334,5 +335,5 @@ if __name__ == "__main__":
     scrape._accept_cookies()            
     scrape._nutrition_button_click()
     scrape._open_all_nutrition_products()
-    scrape.scrape_all_pages()
+    scrape.scrape_all_pages(2)
 

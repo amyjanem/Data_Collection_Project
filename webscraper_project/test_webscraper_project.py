@@ -37,6 +37,22 @@ class TestMyProteinScraper_1(unittest.TestCase):
         pass
 
 
+
+
+#TODO:
+#the behaviour of that method is to scrape x amount of pages and download the image/tabular data from the page.
+#So to test it I would first add a parameter to the method pages_nums, or page_range which can alter which pages the method can scrape.
+#You can then provide it in the test case.
+#So based on the value of page_nums or page_range you should get an expected set of the data/folders created and images saved.
+#You can then test that indeed these folders were created using something like os.path.exists().
+#To test the files you can have the expected file already created read it in.
+#Then read in the file that was downloaded in your test and compare then.
+#You could just do a json.loads for both and compare them in the assertion.
+#For the images you can just read the images in byte form to test them against each other.
+#You can read images in bytes by passing the b flag into your file open statement along with the filemode. Like with open("<filename here>" ,'wb') and compare them that way.
+
+
+
     def tearDown(self):
         self.scrape.driver.quit()
 
