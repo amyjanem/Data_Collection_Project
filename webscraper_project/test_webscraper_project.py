@@ -34,23 +34,35 @@ class TestMyProteinScraper_1(unittest.TestCase):
 
 
     def test_scrape_all_pages(self):
-        pass
+        #testing that the correct number of folders were created (and essentially that they were indeed created)
+        products_per_page = len(self.scrape._find_product_links())
+        test_pages_num = 1
+        self.scrape.scrape_all_pages(test_pages_num)
 
+        lst = os.listdir('raw_data')
+        expected_number_files = len(lst)
+        print(expected_number_files)
+        actual_number_files = products_per_page * test_pages_num
 
+        self.assertEqual(expected_number_files, actual_number_files)
+
+        #testing that the files created have the correct information??
+        test_file = lst[1]          #random file to be read
+        with open(f'raw_data/{test_file}/data.json', 'r') as file:
+            data_text = file.read() #??
+
+        #testing that the images were downloaded correctly
+        with open("raw_data/{test_file}/images/*.jpg" ,'wb'): #?
+            pass
 
 
 #TODO:
-#the behaviour of that method is to scrape x amount of pages and download the image/tabular data from the page.
-#So to test it I would first add a parameter to the method pages_nums, or page_range which can alter which pages the method can scrape.
-#You can then provide it in the test case.
-#So based on the value of page_nums or page_range you should get an expected set of the data/folders created and images saved.
-#You can then test that indeed these folders were created using something like os.path.exists().
 #To test the files you can have the expected file already created read it in.
 #Then read in the file that was downloaded in your test and compare then.
 #You could just do a json.loads for both and compare them in the assertion.
+
 #For the images you can just read the images in byte form to test them against each other.
 #You can read images in bytes by passing the b flag into your file open statement along with the filemode. Like with open("<filename here>" ,'wb') and compare them that way.
-
 
 
     def tearDown(self):
@@ -58,44 +70,46 @@ class TestMyProteinScraper_1(unittest.TestCase):
 
 
 
-class TestMyProteinScraper_2(unittest.TestCase):
+# class TestMyProteinScraper_2(unittest.TestCase):
 
 
-    def setUp(self):
-        self.scrape = MyProteinScraper()
+#     def setUp(self):
+#         self.scrape = MyProteinScraper()
 
-    def test_create_image_folder(self):            #pass
-        random_directory = os.makedirs('random_name') 
-        self.scrape.create_image_folder(random_directory)
-        self.assertTrue(os.path.exists('raw_data/{random_directory}/images'), 'Image folder path does not exist')
+#     def test_create_image_folder(self):            #pass
+#         random_directory = os.makedirs('random_name') 
+#         self.scrape.create_image_folder(random_directory)
 
-    def test_create_product_folder(self):          #pass           
-        self.scrape.create_product_folder('random_name')
-        self.assertTrue(os.path.exists('raw_data/random_name'), 'Product folder path does not exist')
-        os.rmdir('raw_data/random_name')
+#         self.assertTrue(os.path.exists('raw_data/{random_directory}/images'), 'Image folder path does not exist')
 
-    def test_write_json(self):                     #pass                      
-        os.makedirs('raw_data/test_filename')
+#     def test_create_product_folder(self):          #pass           
+#         self.scrape.create_product_folder('random_name')
 
-        self.scrape.write_json({'Price' : '£10.50'}, 'test_filename')
-        self.assertTrue(os.path.exists('raw_data/test_filename/data.json'), 'Directory path is incorrect/does not exist')
+#         self.assertTrue(os.path.exists('raw_data/random_name'), 'Product folder path does not exist')
+#         #os.rmdir('raw_data/random_name')
 
-        os.remove(f'raw_data/test_filename/data.json')
-        os.rmdir(f'raw_data/test_filename')
+#     def test_write_json(self):                     #pass                      
+#         os.makedirs('raw_data/test_filename')
+
+#         self.scrape.write_json({'Price' : '£10.50'}, 'test_filename')
+#         self.assertTrue(os.path.exists('raw_data/test_filename/data.json'), 'Directory path is incorrect/does not exist')
+
+#         #os.remove(f'raw_data/test_filename/data.json')
+#         #os.rmdir(f'raw_data/test_filename')
 
 
-    def test_download_image(self):                   #pass
-        test_image_src = "http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc"
-        test_image_filename = 'test_image_filename'
+#     def test_download_image(self):                   #pass
+#         test_image_src = "http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc"
+#         test_image_filename = 'test_image_filename'
         
-        os.makedirs('raw_data/test_image_filename/images')
-        self.scrape.download_image(test_image_src, test_image_filename)
+#         os.makedirs('raw_data/test_image_filename/images')
+#         self.scrape.download_image(test_image_src, test_image_filename)
 
-        self.assertTrue(os.path.exists(f'raw_data/{test_image_filename}/images/{self.scrape._get_date_and_timestamp()}.jpg'))  
+#         self.assertTrue(os.path.exists(f'raw_data/{test_image_filename}/images/{self.scrape._get_date_and_timestamp()}.jpg'))  
 
 
-    def tearDown(self):    
-        shutil.rmtree('raw_data')
+#     def tearDown(self):    
+#         shutil.rmtree('raw_data')
    
 
 

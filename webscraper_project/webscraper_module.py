@@ -14,15 +14,15 @@ class Webscraper:
         self.driver = webdriver.Chrome()
 
         self.options = webdriver.ChromeOptions()
+        self.options.add_argument('--no-sandbox')               # bypass some security features to allow the scraper to run inside the container
+        self.options.add_argument('--disable-dev-shm-usage')    # disables memory sharing between host system and container
+        self.options.add_argument('--disable-gpu')              # GPU can cause issues on Windows
         self.options.add_argument('--headless')
         self.options.add_argument('--window-size=1920,1080')
-        self.options.add_argument("--disable-gpu")
-        self.options.add_argument("--disable-extensions")
-        self.options.add_argument("--disable-infobars")
-        self.options.add_argument("--disable-notifications")
-        self.options.add_argument('--no-sandbox')
-        self.options.add_argument('--disable-dev-shm-usage')
-
+        self.options.add_argument('--disable-extensions')
+        self.options.add_argument('--disable-infobars')
+        self.options.add_argument('--disable-notifications')
+        
         self.driver = webdriver.Chrome(options = self.options)
   
         self.driver.get(url)

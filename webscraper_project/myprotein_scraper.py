@@ -272,8 +272,8 @@ class MyProteinScraper(Webscraper):
         '''
         product_data_list_all= []                       #list of product dictionaries
         
-        #for link in range(len(product_links)): 
-        for link in range(0,2):                         #for testing (be careful when removing as this will download ALL images - space on harddrive)
+        for link in range(len(product_links)): 
+        #for link in range(0,2):                         #for testing (be careful when removing as this will download ALL images - space on harddrive)
 
             product_link = product_links[link]
             self.driver.get(product_link)
@@ -299,8 +299,15 @@ class MyProteinScraper(Webscraper):
 
 
     def scrape_all_pages(self, pages_num):
-
-        total_pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
+        '''
+        THe webscraper for a specified number of pages, navigates to new pages and scrapes it using the above scrape_one_page method before moving on to the next one.
+        
+        Parameters
+        ----------
+        pages_num: int
+            The desired number of pages to be scraped.
+        '''    
+        total_pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text      #the total amount of pages that can be scraped
 
         #for page in range(1, 3):                        #for testing, only 2 pages
         #for page in range(1, int(total_pages) + 1):     #test all pages
