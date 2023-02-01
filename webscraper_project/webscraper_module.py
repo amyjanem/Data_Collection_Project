@@ -11,7 +11,7 @@ class Webscraper:
     '''
 
     def __init__(self, url: str = "https://www.myprotein.com/"):    #in future can put URL straight to nutrition page to save time
-        self.driver = webdriver.Chrome()
+        #self.driver = webdriver.Chrome()
 
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--no-sandbox')               # bypass some security features to allow the scraper to run inside the container
@@ -22,8 +22,9 @@ class Webscraper:
         self.options.add_argument('--disable-extensions')
         self.options.add_argument('--disable-infobars')
         self.options.add_argument('--disable-notifications')
+        self.options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36') #sets my user agent
         
-        self.driver = webdriver.Chrome(options = self.options)
+        self.driver = webdriver.Chrome(options = self.options) #set options first before initialising driver
   
         self.driver.get(url)
         self.driver.maximize_window()
@@ -102,7 +103,7 @@ class Webscraper:
         return email_signup_button
 
 
-    def _accept_cookies(self, xpath: str = '//button[@class="cookie_modal_button"]'):
+    def _accept_cookies(self, xpath: str = '//button[@id="onetrust-accept-btn-handler"]'):       #old xpath is '//button[@class="cookie_modal_button"]'
         '''
         Accepts the cookies on the webpage.
         
@@ -115,8 +116,8 @@ class Webscraper:
             accept_cookies_button = self._click_element(xpath)
             print('Cookies accepted...\n\n')
             time.sleep(1)
-        except:
-            pass
+        except Exception as e: 
+            print(e)
 
         return accept_cookies_button
 
