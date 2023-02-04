@@ -564,13 +564,19 @@ if __name__ == '__main__':
 
 ## Milestone 6
 
--     This milestone involved containerising the scraper, ie. taking steps to running the system on the cloud and packaging it together in a self-contained unit.
+-     This milestone involved containerising the scraper, ie. taking steps to running the system on the cloud and packaging it 
+      together in a self-contained unit.
 
--     First the code was analysed to be refactored for the final time. It was made sure to check whether the code could have been laid out better. This included looking at methods and variables to see if they were named appropriately, looking for any repitition and correcting it, ensuring methods had only one concern where possible and if not breaking it up into multiple methods, making methods private or protected where necessary, removing nested loops, and ensuring docstrings were consistent.
+-     First the code was analysed to be refactored for the final time. It was made sure to check whether the code could have 
+      been laid out better. This included looking at methods and variables to see if they were named appropriately, looking 
+      for any repitition and correcting it, ensuring methods had only one concern where possible and if not breaking it up 
+      into multiple methods, making methods private or protected where necessary, removing nested loops, and ensuring 
+      docstrings were consistent.
       
  -    It was then checked that all unit tests were passing and if not, correcting them appropriately.
       
- -    Some options were then added to the scraper, which can be seen below, such as to be run in headless mode as this will be needed in order to be run in a Docker container:
+ -    Some options were then added to the scraper, which can be seen below, such as to be run in headless mode as this will be
+      needed in order to be run in a Docker container:
       
 ```python
    def __init__(self, url: str = "https://www.myprotein.com/"):    
@@ -593,7 +599,8 @@ if __name__ == '__main__':
         time.sleep(1)     
 ```      
       
- - A Dockerfile was then created in order to build the image of the scraper. This used a base image of Python, set the working directory, and copied the relevant files from where the image was being built into the container.
+-    A Dockerfile was then created in order to build the image of the scraper. This used a base image of Python, set the working 
+     directory, and copied the relevant files from where the image was being built into the container.
 
 ```python
 FROM python:3.9.7
@@ -632,9 +639,11 @@ CMD ["python", "webscraper_project/myprotein_scraper.py"]
       
 -     CI/CD means continuous integration and continuous delivery/continuous deployment.
 
--     This was startedby setting up the relevant GitHub secrets (namely DOCKERHUB_USERNAME and DOCKERHUB_USERNAME) that contain the credentials required to push to my Dockerhub account.
+-     This was startedby setting up the relevant GitHub secrets (namely DOCKERHUB_USERNAME and DOCKERHUB_USERNAME) that contain
+      the credentials required to push to my Dockerhub account.
      
--     A Github action was then created to trigger on a push to the main branch of my repository, and subsquently build the image and push it to my DockerHub account. The action was set up as shown below:
+-     A Github action was then created to trigger on a push to the main branch of my repository, and subsquently build the image
+      and push it to my DockerHub account. The action was set up as shown below:
 ```python
 name: Docker Image CI
 
