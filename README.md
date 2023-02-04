@@ -632,13 +632,44 @@ CMD ["python", "webscraper_project/myprotein_scraper.py"]
       
 -     CI/CD means continuous integration and continuous delivery/continuous deployment.
 
--     This was startedby setting up the relevant GitHub secrets that contain the credentials required to push to my Dockerhub account.
+-     This was startedby setting up the relevant GitHub secrets (namely DOCKERHUB_USERNAME and DOCKERHUB_USERNAME) that contain the credentials required to push to my Dockerhub account.
      
--     Github action
-      
-      
-## Conclusions
+-     A Github action was then created to trigger on a push to the main branch of my repository, and subsquently build the image and push it to my DockerHub account. The action was set up as shown below:
+```python
+name: Docker Image CI
 
-- Maybe write a conclusion to the project, what you understood about it and also how you would improve it or take it further.
+on:
+  push:
+    branches:
+      - "main"
 
-- Read through your documentation, do you understand everything you've written? Is everything clear and cohesive?
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/clockbox:latest
+```      
+      
+## Conclusion
+
+- Overall this was a very interesting project that covered many important topics and I feel that I really learnt so much working through it. 
