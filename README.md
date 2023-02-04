@@ -1,12 +1,10 @@
 # Data_Collection_Project
 
-
-> The purpose of this project was to use a website to collect and build a dataset from. This was be done using a webscraper.
-> Include here a brief description of the project, what technologies are used etc.
+An implementation of an industry grade data collection pipeline that runs scalably in the cloud. It uses Python code to automatically control your browser, extract information from a website, and store it on the cloud in a data warehouses and data lake. The system conforms to industry best practices such as being containerised in Docker and running automated tests.
 
 ## Milestone 1 & 2
 
-- Milestone 1 & 2 simply involved setting up a GitHub repositary, and deciding on a website to collect from. I chose a website in the Health and Nutrition category as this is something I am passionate about. Thus the website I use in this project is MyProtein - a website selling all kinds of nutrition, supplements, workout clothing and more.
+- Milestone 1 & 2 simply involved setting up a GitHub repositary, and deciding on a website to collect from. I chose a website in the Health and Nutrition category as this is something I am passionate about. Thus the website I use in this project is MyProtein.com - a website selling all kinds of nutrition, supplements, workout clothing and more.
 
 
 ## Milestone 3
@@ -21,17 +19,9 @@ echo $PATH
 pip install
 ```
 
-- A scraper class was then created (WebScraper), along with methods to navigate the website such as to "Accept Cookies", 'X' any email newsletter sign up pop-up's, and click any buttons. These were made to be as general as possible to ensure reusability in future projects.
+- A scraper class was then created (WebScraper), along with methods to navigate the website such as to "Accept Cookies", close any email newsletter sign up pop-up's, and click any buttons. These were made to be as general as possible to ensure reusability in future projects. A couple of examples of these can be seen below:
 
-```python
-class Webscraper:
-
-
-    def __init__(self, url: str = "https://www.myprotein.com/"):
-        self.driver = webdriver.Chrome()
-        self.driver.get(url)
-        self.driver.maximize_window()
-      
+```python   
       
     def click_element(self, xpath: str):
         '''
@@ -100,7 +90,7 @@ class Webscraper:
             pass
 ```
 
-- The following code was then created within another class, MyProteinScraper, as shown below, which inherits from the WebScraper class. The code within this class is specific to the MyProtein website, whereas the code in the WebScraper class is more generalised and can be used to scrape other websites with only minor edits to the code.
+- Another class called MyProteinScraper was created, as shown below, which inherits from the WebScraper class. The code within this class is specific to the MyProtein website, whereas the code in the WebScraper class is more generalised and can be used to scrape other websites with only minor edits to the code.
 ```python
 class MyProteinScraper(Webscraper):  
 ```
@@ -170,14 +160,18 @@ if __name__ == "__main__":
 ```
 
 ## Milestone 4
-- This milestone involved scraping data from each product link that we obtained in the previous milestone. The information to be retrieved included the following: product name, price, rating, image link, and the time the data was scraped. Each product was also assigned a unique ID. 
+- This milestone involved scraping data from each product link that was obtained in the previous milestone. The information to be retrieved included the following: product name, price, rating, image link, and the time the data was scraped. Each product was also assigned a unique ID. 
 
 - The product image was obtained using the following code:
-```python
-    def get_product_image(self):
+```python    
+    def _get_product_image(self) -> str:
         '''
-        Finds the href to the product image.
+        Finds the 'href' (ie. link) to the product image.
 
+        Returns
+        -------
+        product_image: str
+            the URL link to the product image.
         '''
         time.sleep(1)
         product_image = self.driver.find_element(By.XPATH, '//img[@class="athenaProductImageCarousel_image"]').get_attribute('src')
@@ -186,11 +180,16 @@ if __name__ == "__main__":
 ```
 
 - The exact time of data scraping was obtaining using the static method below:
-```python
+```python       
     @staticmethod
-    def get_timestamp():
+    def _get_timestamp() -> str:
         '''
-        Prints the timestamp of current time.
+        Determines the current time and prints it in hours : minutes : seconds format.
+
+        Returns
+        -------
+        current_time: str
+            The current time
         '''
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
@@ -199,18 +198,22 @@ if __name__ == "__main__":
 ```  
 
 - Using the above methods, the data for an individual product was scraped using the below:
-```python
-    def get_product_data(self) -> dict:
+```python            
+    def _get_product_data(self) -> str:
         '''
-        Finds xpath of product name, price, and rating of product and creates a dictionary of all the data.
+        Finds xpath of product name, price, and rating of product and converts the information to a string format.
 
-        Parameters:
-        -----------
-        product_link: str
-            the xpath of the url link to an individual product
+        Returns
+        -------
+        product_name: str
+            The name of the product.
+        
+        product_price: str
+            The price of the product.
+        
+        product_rating: str
+            The ratings of the product.
         '''       
-        product_dict = {}
-
         product_name = self.driver.find_element(By.XPATH, '//h1[@class="productName_title"]').text 
         product_price = self.driver.find_element(By.XPATH, '//p[@class="productPrice_price  "]').text
 
@@ -219,14 +222,39 @@ if __name__ == "__main__":
         except:
             product_rating = 'None'
             pass
+        
+        return product_name, product_price, product_rating
+        
+        
+    def create_product_dict(self, product_name, product_price, product_rating) -> dict:     
+        '''
+        Creates a product dictionary using the below parameters.
+
+        Parameters
+        -----------
+        product_name: str
+            The name of the product.
+
+        product_price: str
+            The price of the product.
+
+        product_rating: str
+            The customer review rating of the product.
+
+        Returns
+        -------
+        product_dict: dict
+            A dictionary of the product data containing name, price and rating.
+        '''
+        product_dict = {}
 
         product_dict.update({
             "Product ID" : str(uuid.uuid4()),
             "Product Name" : product_name,
             "Price" : product_price,
             "Rating" : product_rating,
-            "Time Scraped" : self.get_timestamp(),
-            "Image Link" : self.get_product_image()            
+            "Time Scraped" : self._get_timestamp(),
+            "Image Link" : self._get_product_image()            
             })
 
         return product_dict
@@ -236,11 +264,16 @@ if __name__ == "__main__":
 
 - In order to scrape multiple products on the webpage, a method was created to iterate through the list of links we obtained in the previous milestone (using the find_product_links() method), and obtain the relevant data as well as download the associated jpg image. The product dictionary is saved in a json format to a folder with it's unique product ID as the name. The images are saved in a separate images folder with the filenames in the <date>_<time>_<order of image>.jpg format.
 
-```python
+```python    
     @staticmethod
-    def get_date_and_timestamp():
+    def _get_date_and_timestamp() -> str:
         '''
-        Prints the current date and time.
+        Determines the current date and time and prints it in 'DayMonthYear_HourMinuteSecond' format.
+
+        Returns
+        -------
+        full_datestamp: str
+            The current time
         '''
         now = datetime.now()
         full_datestamp = now.strftime("%d%m%Y_%H%M%S")
@@ -248,54 +281,19 @@ if __name__ == "__main__":
         return full_datestamp
     
     
-    def scrape_pages(self, product_link_list) -> list:
-        '''
-        Iterates through URL links on webpage and scrape data from each, and stores the data in a list.
-        Method also downloads the associated image and stores in a folder with the product ID as the filename.
-
-        Parameters:
-        ----------
-        product_link_list:
-            list of URL's ("href" tags) for each product shown on the webpage.
-        '''
-        product_data_list_all= []   #list of product dictionaries
-
-        for link in range(len(product_link_list)): 
-
-            product_link = product_link_list[link]
-            self.driver.get(product_link)
-
-            time.sleep(1)
-
-            product_data = self.get_product_data()
-
-            filename = list(product_data.values())[0]   #indexes the product ID value and uses it for folder name   
-
-            self.create_product_folder(filename)
-
-            self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
-
-            image_src = self.get_product_image()        #finds and downloads the image before saving it
-            image_filename = self.get_date_and_timestamp()
-            self.download_image(image_src, image_filename)
-
-            product_data_list_all.append(product_data)
-
-        return product_data_list_all
-
-
-    def create_product_folder(self, filename):
+    @staticmethod
+    def create_product_folder(filename):
         '''
         Creates a folder called 'raw_data' if it doesn't already exist, and then creates a folder within that, with the unique product ID as the filename.
 
-        Parameters:
-        -----------
-        filename:
+        Parameters
+        ----------
+        filename: str
             The unique product ID of each product.
         '''
         if not os.path.exists('raw_data'):
             os.makedirs('raw_data')
-
+            
         if not os.path.exists(f'raw_data/{filename}'):
             os.makedirs(f'raw_data/{filename}')
 
@@ -304,53 +302,52 @@ if __name__ == "__main__":
         '''
         Writes the dictionary data to a json file and saves it within it's own product folder.
 
-        Parameters:
-        -----------
-        data:
-            the product dictionary to be saved into the json format
-
-        filename:
-            the unique product ID to be used as a folder name.
+        Parameters
+        ----------
+        data: dict
+            The product dictionary to be saved into the json format.
+        
+        filename: str
+            The unique product ID.
         '''
         with open(f'raw_data/{filename}/data.json', 'w') as file:
-            json.dump(data, file, indent = 4)   
+            json.dump(data, file, indent = 4)   #indent = 4 makes the data more readable
+
+
+    @staticmethod
+    def create_image_folder(filename):
+        '''
+        Creates 'images' folder if it doesn't already exist.
+        
+        Parameters
+        ----------
+        filename: str
+            The unique product ID.
+        '''
+        if not os.path.exists(f'raw_data/{filename}/images'):
+            os.makedirs(f'raw_data/{filename}/images')
 
 
     def download_image(self, image_src, filename):
         '''
-        Creates images folder if it doesn't already exist, and then downloads and saves the relevant .jpg image within it.
+        Downloads and saves the relevant .jpg image within it with the product ID as the filename.
 
-        Parameters:
+        Parameters
         ----------
-        image_src:
-            the URL of the image to be downloaded
-        product_id:
-            the unique product ID to be used as the filename for the image
+        image_src: str
+            The URL of the image to be downloaded.
+        
+        filename: str
+            The unique product ID.
         '''
-        if not os.path.exists('images'):
-            os.makedirs('images')
-
         image_src = requests.get(image_src).content
+        image_filename = self._get_date_and_timestamp()
 
-        with open(f'images/{filename}.jpg', 'wb') as file:     
-            file.write(image_src)    
-```
+        with open(f'raw_data/{filename}/images/{image_filename}.jpg', 'wb') as file:     #wb means file is opened for writing in binary mode.
+            file.write(image_src)
 
-## Milestone 5
 
-This milestone was all about optimising code, and setting up testing for the code using unit tests to ensure each part worked as desired.
-
-- The code was first refactored and optimised by doing the following:
-    - Methods were made sure to be appropriately named, and clear
-    - Repeated code was closely scrutinised and optimised
-    - Methods were ensured to have one concern where possible, for simplification and ease of testing
-    - Methods were made private where necessary (more on this below)
-    - Ensure docstrings were consistent throughout all methods
-    - Break up any nested loops where necessary
-    
-- The scraper() method was namely broken up here into two functions represented below:
-```python
-def scrape_one_page(self, product_links) -> list:
+    def scrape_one_page(self, product_links) -> list:
         '''
         The webscraper for one webpage, which iterates through URL links to find and save relevant product and image data from each.
         
@@ -366,8 +363,8 @@ def scrape_one_page(self, product_links) -> list:
         '''
         product_data_list_all= []                       #list of product dictionaries
         
-        #for link in range(len(product_links)):         #used to retrieve data from all products on page
-        for link in range(0,2):                         #used for testing and to protect space on harddrive when downloading images
+        for link in range(len(product_links)): 
+        #for link in range(0,2):                        #for testing due to harddrive space - will download all images otherwise
 
             product_link = product_links[link]
             self.driver.get(product_link)
@@ -380,58 +377,81 @@ def scrape_one_page(self, product_links) -> list:
 
             self.create_product_folder(filename)
             self.write_json(product_data, filename)     #writes the dictionary to a json file within the folder created above
+            print('Product folders created, and product data saved... \n\n')
 
             product_data_list_all.append(product_data)
 
             self.create_image_folder(filename)
             image = self._get_product_image()
             self.download_image(image, filename)
+            print('Product image downloaded and saved...\n\n')
         
         return product_data_list_all
 
 
-    def scrape_all_pages(self):
+    def scrape_all_pages(self, pages_num):
+        '''
+        The webscraper for a specified number of pages, navigates to new pages and scrapes it using the above scrape_one_page method before moving on to the next one.
+        
+        Parameters
+        ----------
+        pages_num: int
+            The desired number of pages to be scraped.
+        '''    
+        total_pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text      #the total amount of pages that can be scraped
 
-        pages = self.driver.find_element(By.XPATH, '//li/a[@class="responsivePaginationButton responsivePageSelector   responsivePaginationButton--last"]').text
-
-        #for page in range(1, 3):                   #for testing
-        for page in range(1, int(pages) + 1):       #used to scrape all pages
+        #for page in range(1, int(total_pages) + 1):     #test all pages
+        for page in range(1, pages_num + 1):             #scrape specified amount of pages
             links = self._find_product_links()
-            print('product links found\n\n')
+            print('Product links found...\n\n')
             time.sleep(2)
 
             self.scrape_one_page(links)
-            print('page scraped \n\n')
+            print('Page scraped... \n\n')
             time.sleep(2)
 
             self.driver.get(f'https://www.myprotein.com/nutrition/bestsellers-en-gb.list?pageNumber={page}')
             time.sleep(2)
 
             try:
-                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@aria-label="Next page"]')))  
+                WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@aria-label="Next page"]')))   
                 time.sleep(2)
                 self._click_next_page()
-                print('next page clicked...\n\n')
+                print('Next page clicked...\n\n')
                 time.sleep(2)
             except:
-                print('next page NOT clicked, quitting page now...\n\n')
+                print('Quitting page now...\n\n')
                 self.driver.quit()
 ```
+
+## Milestone 5
+
+This milestone was all about optimising code, and setting up testing for the code using unit tests to ensure each part worked as desired.
+
+- The code was first refactored and optimised by doing the following:
+    - Methods were made sure to be appropriately named, and clear
+    - Repeated code was closely scrutinised and optimised
+    - Methods were ensured to have one concern where possible, for simplification and ease of testing
+    - Methods were made private where necessary (more on this below)
+    - Docstrings were ensured to be consistent throughout all methods
+    - Nested loops were broken up where necessary
+    
+ 
 
 - The following methods were kept as public, whereas the remainder of the methods were made private:
     - create_product_dict, create_product_folder, write_json, create_image_folder, download_image, scrape_one_page, and scrape_all_pages
 
 - The if __name__ = '__main__' block was also updated to the below:
-```python
-if __name__ == "__main__":          
-
-    scrape=MyProteinScraper()
+```python 
+    if __name__ == "__main__":          
+    
+    scrape = MyProteinScraper()
 
     scrape._close_email_signup()        
     scrape._accept_cookies()            
     scrape._nutrition_button_click()
     scrape._open_all_nutrition_products()
-    scrape.scrape_all_pages()
+    scrape.scrape_all_pages(2)
 ```
 
 - A file was then created to insert all of the unit tests into. The unit tests tested all of the public methods and this can be seen below:
@@ -453,24 +473,46 @@ class TestMyProteinScraper_1(unittest.TestCase):
         self.scrape._accept_cookies()
         self.scrape._nutrition_button_click()
         self.scrape._open_all_nutrition_products()
-        print('setUp method called...\n\n')          #for testing
+        print('setUp method called...\n\n')          
+
+def test_create_product_dict(self):                 
+        self.scrape._first_product_click()
+        test_dict = self.scrape.create_product_dict('test_name', 'test_price', 'test_rating')
+        self.assertIsInstance(test_dict, dict)
+        print('create_product_dict returns a dictionary')
+
+    def test_scrape_one_page(self):                 
+        link_list = self.scrape._find_product_links()
+        link_length = len(link_list)
+
+        test_function_list = self.scrape.scrape_one_page(link_list)
+        test_function_list_length = len(test_function_list)
+
+        self.assertEqual(link_length, test_function_list_length)
 
 
+    def test_scrape_all_pages(self):        #testing that the correct number of folders were created (and essentially that they were indeed created)
+        products_per_page = len(self.scrape._find_product_links())
+        test_pages_num = 1
+        self.scrape.scrape_all_pages(test_pages_num)
 
+        lst = os.listdir('raw_data')
+        expected_number_files = len(lst)
+        print(expected_number_files)
+        actual_number_files = products_per_page * test_pages_num
 
+        self.assertEqual(expected_number_files, actual_number_files)
 
+        test_file = lst[1]          #random file to be read
+        with open(f'raw_data/{test_file}/data.json', 'r') as file:
+            data_text = file.read() 
 
+        #testing that the images were downloaded correctly
+        with open("raw_data/{test_file}/images/*.jpg" ,'wb'):
+            pass
 
-[insert finished testing code here]
-
-
-
-
-
-
-
-
-
+    def tearDown(self):
+        self.scrape.driver.quit()
 
 
 
@@ -485,12 +527,14 @@ class TestMyProteinScraper_2(unittest.TestCase):
     def test_create_image_folder(self):            #pass
         random_directory = os.makedirs('random_name') 
         self.scrape.create_image_folder(random_directory)
+
         self.assertTrue(os.path.exists('raw_data/{random_directory}/images'), 'Image folder path does not exist')
 
     def test_create_product_folder(self):          #pass           
         self.scrape.create_product_folder('random_name')
+
         self.assertTrue(os.path.exists('raw_data/random_name'), 'Product folder path does not exist')
-        os.rmdir('raw_data/random_name')
+        #os.rmdir('raw_data/random_name')
 
     def test_write_json(self):                     #pass                      
         os.makedirs('raw_data/test_filename')
@@ -511,9 +555,10 @@ class TestMyProteinScraper_2(unittest.TestCase):
 
         self.assertTrue(os.path.exists(f'raw_data/{test_image_filename}/images/{self.scrape._get_date_and_timestamp()}.jpg'))  
 
+
     def tearDown(self):    
-        shutil.rmtree('raw_data')
-   
+        shutil.rmtree('raw_data')   
+
 
 if __name__ == '__main__':
     unittest.main(argv=[''], verbosity=2, exit=False)
