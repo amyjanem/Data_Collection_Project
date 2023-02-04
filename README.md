@@ -515,9 +515,6 @@ def test_create_product_dict(self):
         self.scrape.driver.quit()
 
 
-
-
-
 class TestMyProteinScraper_2(unittest.TestCase):
 
 
@@ -564,12 +561,82 @@ if __name__ == '__main__':
     unittest.main(argv=[''], verbosity=2, exit=False)
 ```
 
-## Milestone n
 
-- Continue this process for every milestone, making sure to display clear understanding of each task and the concepts behind them as well as understanding of the technologies used.
+## Milestone 6
 
-- Also don't forget to include code snippets and screenshots of the system you are building, it gives proof as well as it being an easy way to evidence your experience!
+-     This milestone involved containerising the scraper, ie. taking steps to running the system on the cloud and packaging it together in a self-contained unit.
 
+-     First the code was analysed to be refactored for the final time. It was made sure to check whether the code could have been laid out better. This included looking at methods and variables to see if they were named appropriately, looking for any repitition and correcting it, ensuring methods had only one concern where possible and if not breaking it up into multiple methods, making methods private or protected where necessary, removing nested loops, and ensuring docstrings were consistent.
+      
+ -    It was then checked that all unit tests were passing and if not, correcting them appropriately.
+      
+ -    Some options were then added to the scraper, which can be seen below, such as to be run in headless mode as this will be needed in order to be run in a Docker container:
+      
+```python
+   def __init__(self, url: str = "https://www.myprotein.com/"):    
+
+        self.options = webdriver.ChromeOptions()
+        self.options.add_argument('--no-sandbox')               # bypass some security features to allow the scraper to run inside the container
+        self.options.add_argument('--disable-dev-shm-usage')    # disables memory sharing between host system and container
+        self.options.add_argument('--disable-gpu')              # GPU can cause issues on Windows
+        self.options.add_argument('--headless')
+        self.options.add_argument('--window-size=1920,1080')
+        self.options.add_argument('--disable-extensions')
+        self.options.add_argument('--disable-infobars')
+        self.options.add_argument('--disable-notifications')
+        self.options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36') #sets my user agent
+        
+        self.driver = webdriver.Chrome(options = self.options) #set options first before initialising driver
+  
+        self.driver.get(url)
+        self.driver.maximize_window()
+        time.sleep(1)     
+```      
+      
+ - A Dockerfile was then created in order to build the image of the scraper. This used a base image of Python, set the working directory, and copied the relevant files from where the image was being built into the container.
+
+```python
+FROM python:3.9.7
+
+WORKDIR data_collection_project 
+
+COPY . .
+
+# install google chrome
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+RUN apt-get -y update
+RUN apt-get install -y google-chrome-stable
+
+#install chromedriver
+RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
+RUN apt-get install -yqq unzip
+RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+
+#install requirements (this can be done using a requirements.txt file too)
+RUN pip3 --version
+RUN python -m pip install selenium 
+RUN python -m pip install requests
+RUN python -m pip install --upgrade pip
+
+CMD ["python", "webscraper_project/myprotein_scraper.py"]
+```      
+-     The image was then built using 'docker build -t my_protein_image:1.0 .', and then run using 'docker run my_protein_image'
+      
+-     DockerHub was then logged into and the image was pushed to DockerHub using 'docker push'.
+      
+      
+## Milestone 7
+      
+-     This milestone invloved setting up a CI/CD pipeline to build and deploy the image to DockerHub.
+      
+-     CI/CD means continuous integration and continuous delivery/continuous deployment.
+
+-     This was startedby setting up the relevant GitHub secrets that contain the credentials required to push to my Dockerhub account.
+     
+-     Github action
+      
+      
 ## Conclusions
 
 - Maybe write a conclusion to the project, what you understood about it and also how you would improve it or take it further.
