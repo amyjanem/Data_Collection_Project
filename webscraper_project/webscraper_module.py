@@ -67,7 +67,7 @@ class Webscraper:
         '''
         container = self.driver.find_element(By.XPATH, xpath_container)
         elements_in_container = container.find_elements(By.XPATH, f'./{tag_elements}')
-
+        
         return elements_in_container
 
 
